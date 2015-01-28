@@ -1,0 +1,32 @@
+<polymer-element name="seriously-target">
+	
+	<template>
+		<canvas id="canvas" width="{{width}}" height="{{height}}"></canvas>
+	</template>
+
+	<script>
+
+		Polymer('seriously-target', {
+	
+			publish: {
+				node: {},
+				width: 300,
+				height: 150,
+				sourceID: '',
+				_source: {},	// managed by seriously-graph
+				_seriously: {}, // managed by seriously-graph
+			},
+
+			_seriouslyChanged: function(){
+				this.node = this._seriously.target(this.$.canvas);
+			},
+
+			_sourceChanged: function(){
+				this.node.source = this._source;
+			},
+
+		});
+
+	</script>
+
+</polymer-element>

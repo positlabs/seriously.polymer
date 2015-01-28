@@ -1,0 +1,91 @@
+<!-- 
+
+	// Default usage connects nodes with sourceID pointers
+	//
+	<seriously-graph>
+		<seriously-source id="source" >
+			<img src="images/pencils.jpg" >
+		</seriously-source>
+		<seriously-effect id="pxl8" sourceID="source" type="pixelate" ></seriously-effect>
+		<seriously-target id="target" sourceID="pxl8" ></seriously-target>
+	</seriously-graph>
+
+
+	// Linear graph chains nodes together in the order they appear.
+	// Super cool because it updates node graph when dom elements are re-ordered.
+	// e.g. dragging dom nodes in dev tools!
+	//
+	<seriously-graph linear>
+		<seriously-source >
+			<img src="images/pencils.jpg" >
+		</seriously-source>
+		<seriously-effect type="pixelate" ></seriously-effect>
+		<seriously-target ></seriously-target>
+	</seriously-graph>
+
+ -->
+
+<polymer-element name="seriously-graph">
+
+	<template>
+		<content></content>
+	</template>
+
+	<script>
+		Polymer('seriously-graph', {
+
+			publish: {
+				linear: false // daisy chain nodes. default is to look for sourceID
+			},
+
+			domReady: function(){
+				var srsly = this.seriously = new Seriously();
+
+				var nodes = Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+				nodes.forEach(function(node){
+					node._seriously = srsly;
+				});
+
+				var _this = this;
+				setTimeout(function(){ // waiting for change listeners to fire after setting serioulsy instance on nodes
+					_this.connectNodes();
+					// _this.onMutation(_this.mutated);
+				}, 1);
+
+				// reconnect nodes when node order changes 
+				// TODO: and when inputIDs change
+				// this.mutated = this.mutated.bind(this);
+				this.onMutation(this, this.mutated);
+
+				this.seriously.go();
+			},
+
+			connectNodes: function(){
+				var nodes = Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+
+				if(this.linear){ // daisy chain
+
+					for (var i = 1; i < nodes.length; i++) {
+						nodes[i]._source = nodes[i-1].node;
+					}
+
+				}else{ // connect nodes based on sourceID
+
+					var _this = this;
+					nodes.forEach(function(node){
+						if(node.sourceID){
+							node._source = _this.querySelector('#' + node.sourceID).node;
+						}
+					});
+				}
+			},
+
+			mutated: function(){
+				this.connectNodes();
+				this.onMutation(this.mutated);
+			}
+
+		});
+	</script>
+
+</polymer-element>
