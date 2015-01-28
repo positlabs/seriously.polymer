@@ -11,7 +11,9 @@
 	</seriously-graph>
 
 
-	// linear graph chains nodes together in the order they appear
+	// Linear graph chains nodes together in the order they appear.
+	// Super cool because it updates node graph when dom elements are re-ordered.
+	// e.g. dragging dom nodes in dev tools!
 	//
 	<seriously-graph linear>
 		<seriously-source >
@@ -46,28 +48,42 @@
 
 				var _this = this;
 				setTimeout(function(){ // waiting for change listeners to fire after setting serioulsy instance on nodes
-					
-					if(_this.linear){ // daisy chain
-
-						for (var i = 1; i < nodes.length; i++) {
-							nodes[i]._source = nodes[i-1].node;
-						}
-
-					}else{ // connect nodes based on sourceID
-
-						nodes.forEach(function(node){
-							if(node.sourceID){
-								node._source = _this.querySelector('#' + node.sourceID).node;
-							}
-						});
-					}
-
+					_this.connectNodes();
+					// _this.onMutation(_this.mutated);
 				}, 1);
 
-				//TODO: reconnect nodes when node order changes, or when inputIDs change
+				// reconnect nodes when node order changes 
+				// TODO: and when inputIDs change
+				// this.mutated = this.mutated.bind(this);
+				this.onMutation(this, this.mutated);
 
 				this.seriously.go();
 			},
+
+			connectNodes: function(){
+				var nodes = Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+
+				if(this.linear){ // daisy chain
+
+					for (var i = 1; i < nodes.length; i++) {
+						nodes[i]._source = nodes[i-1].node;
+					}
+
+				}else{ // connect nodes based on sourceID
+
+					var _this = this;
+					nodes.forEach(function(node){
+						if(node.sourceID){
+							node._source = _this.querySelector('#' + node.sourceID).node;
+						}
+					});
+				}
+			},
+
+			mutated: function(){
+				this.connectNodes();
+				this.onMutation(this.mutated);
+			}
 
 		});
 	</script>
