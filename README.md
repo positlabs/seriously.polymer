@@ -1,6 +1,7 @@
 # seriously.polymer
 Polymer components for Seriously.js
 
+http://positlabs.github.io/seriously.polymer/
 
 Do `bower install` to grab dependencies.
 
