@@ -9,7 +9,7 @@ Do `bower install` to grab dependencies.
 
 Use declaritive magic to create Seriously.js node graphs! Woah!
 
-```
+```html
 <seriously-graph linear>
 	<seriously-source>
 		<img src="images/pencils.jpg">
