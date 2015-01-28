@@ -1,0 +1,35 @@
+<link rel="import" href="seriously-components.html">
+<script src="bower_components/Seriously.js/effects/seriously.pixelate.js"></script>
+<polymer-element name="demo-component">
+
+	<template>
+
+		<seriously-graph>
+			
+			<seriously-source id="source">
+				<img src="images/pencils.jpg">
+			</seriously-source>
+
+			<seriously-effect id="pxl8" sourceID="source" type="pixelate" properties="{{ {pixelSize: pixelSize} }}"></seriously-effect>
+			
+			<seriously-target id="target" sourceID="pxl8" width="411" height="425"></seriously-target>
+
+		</seriously-graph>
+
+	</template>
+
+	<script>
+		Polymer('demo-component', {
+
+			ready: function(){
+
+				// testing changes within a properties object.
+				setTimeout(function(){
+					this.pixelSize = [6, 6];
+				}.bind(this), 1);
+
+			}
+		});
+	</script>
+
+</polymer-element>

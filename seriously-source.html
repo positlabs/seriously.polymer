@@ -1,0 +1,44 @@
+<!-- 
+
+	// nest the element you want to use as the source
+	//
+
+	<seriously-source id="source">
+		<img src="images/pencils.jpg">
+	</seriously-source>
+
+	<seriously-source id="source">
+		<video src="videos/motionpicture.mp4" loop muted autoplay>
+	</seriously-source>
+
+	...etc
+ -->
+
+<polymer-element name="seriously-source">
+	
+	<template>
+		<div hidden>
+			<content></content>
+		</div>
+	</template>
+
+	<script>
+		
+		Polymer('seriously-source', {
+
+			publish: {
+				node: {},
+				_seriously: {}, // managed by seriously-graph
+			},
+
+			_seriouslyChanged: function(){
+				// could have src on the component and detect filetype, but seriously already does type detection. 
+				// Keeping it simple this way.
+				this.node = this._seriously.source(this.children[0]);
+			}
+
+		});
+
+	</script>
+
+</polymer-element>

@@ -1,0 +1,66 @@
+<!-- 
+ -->
+<polymer-element name="seriously-effect">
+
+	<template>
+
+	</template>
+
+	<script>
+
+		Polymer('seriously-effect', {
+
+			publish: {
+				node: {},		// instance of the effect
+				type: '',		// type of effect
+				sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
+				properties: {}, // props to apply to the effect
+				_source: {}, 	// the actual Source object. managed by seriously-graph
+				_seriously: {}, // instance of Seriously. managed by seriously-graph
+			},
+
+			ready: function(){
+				this.onPropObserverChange = this.onPropObserverChange.bind(this);
+			},
+
+			propertiesChanged: function(){
+				// console.log('seriously-effect.propertiesChanged');
+				if(!this.node) return;
+				this.applyProps();
+
+				// create change watchers for all of the members in properties (shallow?)
+				// https://github.com/Polymer/observe-js
+				if(this.propObserver) this.propObserver.close();
+				this.propObserver = new ObjectObserver(this.properties);
+				this.propObserver.open(this.onPropObserverChange);
+			},
+
+			onPropObserverChange: function(added, removed, changed, getOldValueFn){
+				// console.log('seriously-effect.onPropObserverChange', arguments);
+				this.applyProps();
+			},
+
+			applyProps: function(){
+				var _this = this;
+				Object.keys(this.properties).map(function(key){
+					_this.node[key] = _this.properties[key];
+				});
+			},
+
+			_sourceChanged: function(){
+				// console.log('seriously-effect._sourceChanged');
+				this.node.source = this._source;
+			},
+
+			_seriouslyChanged: function(){
+				// console.log('seriously-effect.seriouslyChanged');
+
+				// got instance of seriously! instantiate effect
+				this.node = this._seriously.effect(this.type);
+				this.applyProps();
+			}
+		});
+
+	</script>
+
+</polymer-element>
