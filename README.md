@@ -18,3 +18,11 @@ Use declaritive magic to create Seriously.js node graphs! Woah!
 </seriously-graph>
 
 ```
+
+
+TODO
+=====
+
+- docs mentioning loading of effects. Same way Seriously does it.
+- test some complex node graphs
+- browser compatibility tests
