@@ -1,13 +1,15 @@
 # seriously.polymer
-Polymer components for Seriously.js
 
+Polymer components for [Seriously.js][1]
+
+http://positlabs.github.io/seriously.polymer/
 
 Do `bower install` to grab dependencies.
 
 
 Use declaritive magic to create Seriously.js node graphs! Woah!
 
-```
+```html
 <seriously-graph linear>
 	<seriously-source>
 		<img src="images/pencils.jpg">
@@ -26,3 +28,5 @@ TODO
 - docs mentioning loading of effects. Same way Seriously does it.
 - test some complex node graphs
 - browser compatibility tests
+
+[1]:https://github.com/brianchirls/Seriously.js
