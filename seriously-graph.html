@@ -47,15 +47,14 @@
 				});
 
 				var _this = this;
-				setTimeout(function(){ // waiting for change listeners to fire after setting serioulsy instance on nodes
-					_this.connectNodes();
-					// _this.onMutation(_this.mutated);
+				setTimeout(function(){ // waiting for change listeners to fire after setting seriously instance on nodes
+					// _this.connectNodes();
+					_this.mutated();
 				}, 1);
 
 				// reconnect nodes when node order changes 
 				// TODO: and when inputIDs change
-				// this.mutated = this.mutated.bind(this);
-				this.onMutation(this, this.mutated);
+				// this.onMutation(this, this.mutated);
 
 				this.seriously.go();
 			},
@@ -66,7 +65,9 @@
 				if(this.linear){ // daisy chain
 
 					for (var i = 1; i < nodes.length; i++) {
-						nodes[i]._source = nodes[i-1].node;
+						try{
+							nodes[i]._source = nodes[i-1].node;
+						}catch(e){console.warn(e)}
 					}
 
 				}else{ // connect nodes based on sourceID
@@ -78,11 +79,12 @@
 						}
 					});
 				}
+
 			},
 
 			mutated: function(){
 				this.connectNodes();
-				this.onMutation(this.mutated);
+				this.onMutation(this, this.mutated);
 			}
 
 		});

@@ -1,12 +1,23 @@
-<!-- 
- -->
+
 <polymer-element name="seriously-effect">
 
 	<template>
+		
+		<template if="{{debug}}">
+			<!-- TODO: add controls for debug mode! -->
+		</template>
 
 	</template>
 
 	<script>
+
+
+		/**
+			
+			wrapper for seriously.effect nodes
+
+		*/
+
 
 		Polymer('seriously-effect', {
 
@@ -14,37 +25,13 @@
 				node: {},		// instance of the effect
 				type: '',		// type of effect
 				sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
-				properties: {}, // props to apply to the effect
+				debug: false,	// shows controls for node properties
 				_source: {}, 	// the actual Source object. managed by seriously-graph
 				_seriously: {}, // instance of Seriously. managed by seriously-graph
 			},
 
 			ready: function(){
-				this.onPropObserverChange = this.onPropObserverChange.bind(this);
-			},
-
-			propertiesChanged: function(){
-				// console.log('seriously-effect.propertiesChanged');
-				if(!this.node) return;
-				this.applyProps();
-
-				// create change watchers for all of the members in properties (shallow?)
-				// https://github.com/Polymer/observe-js
-				if(this.propObserver) this.propObserver.close();
-				this.propObserver = new ObjectObserver(this.properties);
-				this.propObserver.open(this.onPropObserverChange);
-			},
-
-			onPropObserverChange: function(added, removed, changed, getOldValueFn){
-				// console.log('seriously-effect.onPropObserverChange', arguments);
-				this.applyProps();
-			},
-
-			applyProps: function(){
-				var _this = this;
-				Object.keys(this.properties).map(function(key){
-					_this.node[key] = _this.properties[key];
-				});
+				this._attrMutationHandler = this._attrMutationHandler.bind(this);
 			},
 
 			_sourceChanged: function(){
@@ -54,10 +41,34 @@
 
 			_seriouslyChanged: function(){
 				// console.log('seriously-effect.seriouslyChanged');
-				// got instance of seriously! instantiate effect
-				this.node = this._seriously.effect(this.type);
-				this.applyProps();
-			}
+				this.node = this._seriously.effect(this.type); // invalidate node
+				this._setupAttributes();
+			},
+
+			_setupAttributes: function(){
+				var inputs = this.node.inputs();
+				console.log(inputs, Object.keys(inputs));
+
+				if(this.attrObserver) this.attrObserver.close();
+				this.attrObserver = new MutationObserver(this._attrMutationHandler);
+				this.attrObserver.observe(this, {
+					attributes: true,
+					subtree: false,
+					childList: false,
+					characterData: false,
+					attributeOldValue: false,
+					attributeFilter: Object.keys(inputs),
+				});
+			},
+
+			_attrMutationHandler: function(mutations){
+				// console.log('seriously-effect._mutationHandler', mutations);
+				for (var i = mutations.length - 1; i >= 0; i--) {
+					var m = mutations[i];
+					this.node[m.attributeName] = this.attributes[m.attributeName].value;
+				};
+			},
+
 		});
 
 	</script>
