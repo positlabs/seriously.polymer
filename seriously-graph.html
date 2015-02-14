@@ -55,11 +55,10 @@
 					node._seriously = srsly;
 				});
 
-				var _this = this;
 				setTimeout(function(){ // waiting for change listeners to fire after setting seriously instance on nodes
-					_this._connectNodes();
-					_this.onMutation(_this, this._mutated);
-				}, 1);
+					this._connectNodes();
+					this.onMutation(this, this._mutated);
+				}.bind(this), 1);
 
 				this.seriously.go();
 			},
@@ -100,12 +99,12 @@
 			},
 
 			onNodeSourceIDChanged: function(){
-				console.log('seriously-graph.onNodeSourceIDChanged', this);
+				// console.log('seriously-graph.onNodeSourceIDChanged', this);
 				this._connectNodes();
 			},
 
 			_mutated: function(){
-				console.log('seriously-graph._mutated', arguments);
+				// console.log('seriously-graph._mutated', arguments);
 				this._connectNodes(); // reconnect nodes when node order changes 
 				this.onMutation(this, this._mutated);
 			}

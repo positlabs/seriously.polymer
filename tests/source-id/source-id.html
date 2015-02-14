@@ -1,0 +1,43 @@
+<polymer-element name="source-id">
+
+	<template>
+		
+		<seriously-graph>
+			
+			<seriously-source id="source-1">
+				<img src="../../images/robot.jpg">
+			</seriously-source>
+
+			<seriously-source id="source-2">
+				<img src="../../images/pencils.jpg">
+			</seriously-source>
+
+			<seriously-effect id="blurNode" sourceID="source-1" type="blur" amount=".5"></seriously-effect>
+			
+			<seriously-target id="target" sourceID="blurNode" width="411" height="425"></seriously-target>
+
+		</seriously-graph>
+
+	</template>
+
+	<script>
+
+		Polymer('source-id', {
+			
+			ready: function(){
+
+				setTimeout(function(){
+					this.$.blurNode.sourceID = 'source-2';
+				}.bind(this), 1000);
+
+				setTimeout(function(){
+					this.$.target.sourceID = 'source-1';
+				}.bind(this), 3000);
+
+			},
+
+		});
+
+	</script>
+
+</polymer-element>

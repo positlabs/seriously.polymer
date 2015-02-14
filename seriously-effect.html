@@ -59,7 +59,7 @@
 				for (var i = keys.length - 1; i >= 0; i--) {
 					var key = keys[i];
 					if(key !== 'source'){ // source assignment is automated by seriously-graph
-						this.node[key] = this.attributes[key].value; // piggy back the map to copy props to node
+						this.node[key] = this.attributes[key].value; // copy props to node
 						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
 					}
 				}
@@ -78,7 +78,7 @@
 			},
 
 			_attrMutationHandler: function(mutations){
-				console.log('seriously-effect._mutationHandler', mutations);
+				// console.log('seriously-effect._mutationHandler', mutations);
 
 				for (var i = mutations.length - 1; i >= 0; i--) {
 					var m = mutations[i],
