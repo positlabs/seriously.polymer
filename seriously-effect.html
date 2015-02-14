@@ -1,5 +1,7 @@
 
-<polymer-element name="seriously-effect">
+<link rel="import" href="./seriously-node.html">
+
+<polymer-element name="seriously-effect" extends="seriously-node">
 
 	<template>
 		
@@ -14,6 +16,16 @@
 		/**
 			
 			wrapper for seriously.effect nodes
+
+
+			TODO 	serialize attributes
+						- boolean
+						- number
+						- array
+						- string
+
+			possible we only need to detect arrays. other types may work as-is.
+
 
 		*/
 

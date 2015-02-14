@@ -28,6 +28,7 @@ TODO
 - docs mentioning loading of effects. Same way Seriously does it.
 - test some complex node graphs
 - browser compatibility tests
+- seriously-graph.export() -> vanilla js
 
 [1]:https://github.com/brianchirls/Seriously.js
 

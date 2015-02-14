@@ -1,3 +1,5 @@
+<link rel="import" href="./seriously-node.html">
+
 <!-- 
 
 	// Default usage connects nodes with sourceID pointers
@@ -33,10 +35,6 @@
 
 	<script>
 
-		// TODO: connect nodes when inputIDs change
-		// listen for an event emitted by seriously components
-
-
 		Polymer('seriously-graph', {
 
 			publish: {
@@ -68,11 +66,11 @@
 				return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
 			},
 
-			// TODO: might need to debounce this
+			// TODO: might be prudent to debounce this
 			_connectNodes: function(){
 				var nodes = this._getNodes();
 
-				// FIXME: how can we avoid the cyclical ref error produced by seriously?
+				// FIXME: how can we prevent the cyclical ref error produced by seriously?
 				// tried setting all node.source's to undefined.
 				// tried stopping seriously before source assignment, restarting after new source assignments
 
@@ -105,7 +103,8 @@
 
 			_mutated: function(){
 				// console.log('seriously-graph._mutated', arguments);
-				this._connectNodes(); // reconnect nodes when node order changes 
+				// NOTE: not sure if this is the most efficient way to do this. When is onMutation callback triggered?
+				this._connectNodes(); // reconnect nodes when node order changes
 				this.onMutation(this, this._mutated);
 			}
 
