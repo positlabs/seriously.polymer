@@ -13,8 +13,9 @@
 			</seriously-source>
 
 			<seriously-effect id="blurNode" sourceID="source-1" type="blur" amount=".5"></seriously-effect>
+			<seriously-effect id="pixelate" sourceID="blurNode" type="pixelate"></seriously-effect>
 			
-			<seriously-target id="target" sourceID="blurNode" width="411" height="425"></seriously-target>
+			<seriously-target id="target" sourceID="pixelate" width="411" height="425"></seriously-target>
 
 		</seriously-graph>
 
