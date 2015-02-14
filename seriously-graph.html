@@ -32,59 +32,82 @@
 	</template>
 
 	<script>
+
+		// TODO: connect nodes when inputIDs change
+		// listen for an event emitted by seriously components
+
+
 		Polymer('seriously-graph', {
 
 			publish: {
 				linear: false // daisy chain nodes. default is to look for sourceID
 			},
 
+			ready: function(){
+				this.onNodeSourceIDChanged = this.onNodeSourceIDChanged.bind(this);
+			},
+
 			domReady: function(){
 				var srsly = this.seriously = new Seriously();
 
-				var nodes = Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+				var nodes = this._getNodes();
 				nodes.forEach(function(node){
 					node._seriously = srsly;
 				});
 
 				var _this = this;
 				setTimeout(function(){ // waiting for change listeners to fire after setting seriously instance on nodes
-					// _this.connectNodes();
-					_this.mutated();
+					_this._connectNodes();
+					_this.onMutation(_this, this._mutated);
 				}, 1);
-
-				// reconnect nodes when node order changes 
-				// TODO: and when inputIDs change
-				// this.onMutation(this, this.mutated);
 
 				this.seriously.go();
 			},
 
-			connectNodes: function(){
-				var nodes = Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+			_getNodes: function(){
+				// NOTE: might need to use a different method for this to ensure order is maintained.
+				return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+			},
+
+			// TODO: might need to debounce this
+			_connectNodes: function(){
+				var nodes = this._getNodes();
+
+				// FIXME: how can we avoid the cyclical ref error produced by seriously?
+				// tried setting all node.source's to undefined.
+				// tried stopping seriously before source assignment, restarting after new source assignments
 
 				if(this.linear){ // daisy chain
 
 					for (var i = 1; i < nodes.length; i++) {
-						try{
-							nodes[i]._source = nodes[i-1].node;
-						}catch(e){console.warn(e)}
+						nodes[i]._source = nodes[i-1].node;
 					}
 
 				}else{ // connect nodes based on sourceID
 
-					var _this = this;
 					nodes.forEach(function(node){
 						if(node.sourceID){
-							node._source = _this.querySelector('#' + node.sourceID).node;
+							node._source = this.querySelector('#' + node.sourceID).node;
 						}
-					});
+					}.bind(this));
 				}
+
+				nodes.forEach(function(node){
+					node.removeEventListener('sourceIDChanged', this.onNodeSourceIDChanged); // ensure listeners don't get doubled up
+					node.addEventListener('sourceIDChanged', this.onNodeSourceIDChanged);
+				}.bind(this));
 
 			},
 
-			mutated: function(){
-				this.connectNodes();
-				this.onMutation(this, this.mutated);
+			onNodeSourceIDChanged: function(){
+				console.log('seriously-graph.onNodeSourceIDChanged', this);
+				this._connectNodes();
+			},
+
+			_mutated: function(){
+				console.log('seriously-graph._mutated', arguments);
+				this._connectNodes(); // reconnect nodes when node order changes 
+				this.onMutation(this, this._mutated);
 			}
 
 		});

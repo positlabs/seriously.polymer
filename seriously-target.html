@@ -25,6 +25,11 @@
 				this.node.source = this._source;
 			},
 
+			sourceIDChanged: function(){
+				// console.log('seriously-target.sourceIDChanged', this.sourceID);
+				this.fire('sourceIDChanged', {sourceID, this.sourceID});
+			},
+
 		});
 
 	</script>

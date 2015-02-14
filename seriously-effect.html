@@ -11,19 +11,17 @@
 
 	<script>
 
-
 		/**
 			
 			wrapper for seriously.effect nodes
 
 		*/
 
-
 		Polymer('seriously-effect', {
 
 			publish: {
 				node: {},		// instance of the effect
-				type: '',		// type of effect
+				type: '',		// type of effect. used to generate effect instance
 				sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
 				debug: false,	// shows controls for node properties
 				_source: {}, 	// the actual Source object. managed by seriously-graph
@@ -32,6 +30,11 @@
 
 			ready: function(){
 				this._attrMutationHandler = this._attrMutationHandler.bind(this);
+			},
+
+			sourceIDChanged: function(){
+				// console.log('seriously-effect.sourceIDChanged', this.sourceID);
+				this.fire('sourceIDChanged', {sourceID: this.sourceID});
 			},
 
 			_sourceChanged: function(){
@@ -45,9 +48,21 @@
 				this._setupAttributes();
 			},
 
+			// set up mutationObserver for attributes and assign initial values
 			_setupAttributes: function(){
-				var inputs = this.node.inputs();
-				console.log(inputs, Object.keys(inputs));
+				// console.log('seriously-effect._setupAttributes', this.type);
+
+				var inputs = this.node.inputs(),
+					keys = Object.keys(inputs),
+					watchKeys = [];
+
+				for (var i = keys.length - 1; i >= 0; i--) {
+					var key = keys[i];
+					if(key !== 'source'){ // source assignment is automated by seriously-graph
+						this.node[key] = this.attributes[key].value; // piggy back the map to copy props to node
+						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
+					}
+				}
 
 				if(this.attrObserver) this.attrObserver.close();
 				this.attrObserver = new MutationObserver(this._attrMutationHandler);
@@ -57,15 +72,18 @@
 					childList: false,
 					characterData: false,
 					attributeOldValue: false,
-					attributeFilter: Object.keys(inputs),
+					attributeFilter: watchKeys,
 				});
+
 			},
 
 			_attrMutationHandler: function(mutations){
-				// console.log('seriously-effect._mutationHandler', mutations);
+				console.log('seriously-effect._mutationHandler', mutations);
+
 				for (var i = mutations.length - 1; i >= 0; i--) {
-					var m = mutations[i];
-					this.node[m.attributeName] = this.attributes[m.attributeName].value;
+					var m = mutations[i],
+						value = this.attributes[m.attributeName].value;
+					this.node[m.attributeName] = value;
 				};
 			},
 
