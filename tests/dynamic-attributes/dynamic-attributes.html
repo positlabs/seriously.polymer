@@ -1,0 +1,70 @@
+<polymer-element name="dynamic-attributes">
+
+	<template></template>
+
+	<script>
+	(function(){
+	
+		var proto = {
+
+			publish: {
+				foo: 0,
+				bar: false
+			},
+			
+			ready: function(){
+				console.dir(this);
+
+				this.publishAttributes({
+					baz: 'baz',
+					arr: [1, 2, 3],
+					obj: {a:true, b:'b', c: 0},
+					func: function(){},
+				});
+
+				setTimeout(function(){
+					this.setAttribute('baz', 'bazzzz');
+					this.setAttribute('arr', [3, 2, 1]);
+					this.setAttribute('obj', {a:false, b:'bbbb', c: 10});
+				}.bind(this), 2000);
+
+			},
+
+			publishAttributes: function(attrs){
+
+				var keys = Object.keys(attrs),
+					watchKeys = [];
+
+				for (var i = keys.length - 1; i >= 0; i--) {
+					var key = keys[i];
+					if(key !== 'source'){ // blacklist. source assignment is automated by seriously-graph
+						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
+					}
+					this.setAttribute(key, attrs[key]);
+
+				}
+
+				if(this.attrObserver) this.attrObserver.close();
+				this.attrObserver = new MutationObserver(this._attrMutationHandler);
+				this.attrObserver.observe(this, {
+					attributes: true,
+					// subtree: true, // what is this?
+					// characterData: true, // what is this?
+					// attributeOldValue: true,
+					attributeFilter: watchKeys,
+				});
+
+			},
+
+			_attrMutationHandler: function(mutations){
+				console.log('_attrMutationHandler', mutations);
+			},
+		};
+
+		Polymer('dynamic-attributes', proto);
+
+	})();
+	</script>
+
+
+</polymer-element>

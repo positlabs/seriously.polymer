@@ -1,6 +1,6 @@
 # seriously.polymer
 
-Polymer components for [Seriously.js][1]
+[Polymer components][2] for [Seriously.js][1]
 
 http://positlabs.github.io/seriously.polymer/
 
@@ -31,7 +31,7 @@ TODO
 - seriously-graph.export() -> vanilla js
 
 [1]:https://github.com/brianchirls/Seriously.js
-
+[2]:http://polymer-project.org
 
 NOTES
 =====

@@ -12,6 +12,12 @@
 
 		Polymer('seriously-node', {
 
+			publish: { // probably gets overwritten, but good for reference
+				node: {},
+				debug: false,
+				_seriously: {}, // managed by seriously-graph
+			},
+
 			moveUp: function(){
 				//TODO: move up/back in node list
 			},
