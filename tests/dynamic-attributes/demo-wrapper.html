@@ -1,0 +1,23 @@
+<link rel="import" href="dynamic-attributes.html">
+<polymer-element name="demo-wrapper">
+
+	<template>
+		<dynamic-attributes id="dynattr" foo="{{true}}" arr="{{[4, 5, 6]}}"></dynamic-attributes>
+	</template>
+
+	<script>
+
+		Polymer({
+			ready: function(){
+				setTimeout(function(){
+					this.$.dynattr.setAttribute('foo', false);
+					this.$.dynattr.baz = 'bazzzzzz';
+					this.$.dynattr.arr = [1, 2, 3];
+				}.bind(this), 2000);
+			}
+		});
+
+	</script>
+
+
+</polymer-element>

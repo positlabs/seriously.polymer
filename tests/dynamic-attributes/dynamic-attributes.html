@@ -1,55 +1,73 @@
 <polymer-element name="dynamic-attributes">
 
-	<template></template>
+	<template>
+		<!-- FIXME: template doesn't update... -->
+		<p>foo: {{foo}}</p>
+		<p>baz: {{baz}}</p>
+		<p>arr: {{arr}}</p>
+	</template>
 
 	<script>
 	(function(){
 	
 		var proto = {
 
-			publish: {
-				foo: 0,
-				bar: false
-			},
-			
 			ready: function(){
 				console.dir(this);
 
 				this.publishAttributes({
 					baz: 'baz',
+					foo: true,
 					arr: [1, 2, 3],
-					obj: {a:true, b:'b', c: 0},
-					func: function(){},
 				});
-
-				setTimeout(function(){
-					this.setAttribute('baz', 'bazzzz');
-					this.setAttribute('arr', [3, 2, 1]);
-					this.setAttribute('obj', {a:false, b:'bbbb', c: 10});
-				}.bind(this), 2000);
-
 			},
 
 			publishAttributes: function(attrs){
 
 				var keys = Object.keys(attrs),
-					watchKeys = [];
+					watchKeys = [],
+					_this = this;
 
 				for (var i = keys.length - 1; i >= 0; i--) {
-					var key = keys[i];
-					if(key !== 'source'){ // blacklist. source assignment is automated by seriously-graph
-						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
-					}
-					this.setAttribute(key, attrs[key]);
 
+					(function(){
+
+						var key = keys[i];
+						// if(key !== 'source'){ // blacklist. source assignment is automated by seriously-graph
+						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
+
+						// define prop accessors
+						Object.defineProperty(this, key, {
+							get: function() {
+								// console.log('getting', key, this[key+'_']);
+								return this[key+'_'];
+							},
+							set: function(value) {
+								// console.log('setting', key, 'to', value);
+								this[key+'_'] = value;
+								// _this.node[key] = value;
+								this.templateInstance.model[key] = value;
+							},
+						});
+
+						var attr = this.getAttribute(key);
+						if(attr == null){
+							attr = attrs[key];
+						}else{
+							attr = this._deserialize(attr);
+						}
+						this[key] = attr;
+
+					}.bind(this))();
+
+					// }
 				}
 
+				// listen for attribute changes
 				if(this.attrObserver) this.attrObserver.close();
-				this.attrObserver = new MutationObserver(this._attrMutationHandler);
+				this.attrObserver = new MutationObserver(this._attrMutationHandler.bind(this));
 				this.attrObserver.observe(this, {
 					attributes: true,
-					// subtree: true, // what is this?
-					// characterData: true, // what is this?
 					// attributeOldValue: true,
 					attributeFilter: watchKeys,
 				});
@@ -57,7 +75,26 @@
 			},
 
 			_attrMutationHandler: function(mutations){
-				console.log('_attrMutationHandler', mutations);
+				// console.log('_attrMutationHandler', mutations, this);
+
+				for (var i = mutations.length - 1; i >= 0; i--) {
+					var m = mutations[i];
+					var value = this.getAttribute(m.attributeName);
+					this[m.attributeName] = this._deserialize(value);
+				};
+			},
+
+			// convert string to array, number, or boolean
+			_deserialize: function(value){
+				// console.log('_deserialize', value);
+
+				//TODO: cache type
+				if(value === 'true') return true;
+				else if(value === 'false') return false;
+				else if(typeof value === 'string') return value;
+				else if(!isNaN(Number(value))) return Number(value);
+				else if(value.split(',').length > 0) return value.split(','); // array
+				else return null;
 			},
 		};
 
@@ -66,5 +103,5 @@
 	})();
 	</script>
 
-
 </polymer-element>
+
