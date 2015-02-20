@@ -3,13 +3,7 @@
 
 <polymer-element name="seriously-effect" extends="seriously-node">
 
-	<template>
-		
-		<template if="{{debug}}">
-			<!-- TODO: add controls for debug mode! -->
-		</template>
-
-	</template>
+	<!-- <template></template> -->
 
 	<script>
 
@@ -22,11 +16,8 @@
 		Polymer('seriously-effect', {
 
 			publish: {
-				node: undefined,// instance of the effect
-				type: '',		// type of effect. used to generate effect instance
-				source: '', 	// input component.
-				debug: false,	// shows controls for node properties
-				_seriously: {}, // instance of Seriously. managed by seriously-graph
+				type: '',			// type of effect. used to generate effect instance
+				source: {}, 		// input component.
 			},
 
 			ready: function(){
@@ -41,11 +32,12 @@
 			_seriouslyChanged: function(){
 				// console.log('seriously-effect.seriouslyChanged', this.source.node);
 				this.node = this._seriously.effect(this.type); // invalidate node
-				if(this.source) this.node.source = this.source.node;
+				if(this.source && this.source.node) this.node.source = this.source.node;
 
 				this._publishAttributes(this.node.inputs());
 			},
 
+			// set up dynamic attributes from node.inputs()
 			_publishAttributes: function(attrs){
 
 				var keys = Object.keys(attrs),
@@ -68,7 +60,7 @@
 								},
 								set: function(value) {
 									// console.log('setting', key, 'to', value);
-									_this[key+'_'] = value;
+									// _this[key+'_'] = value;
 									_this.node[key] = value;
 								},
 							});
@@ -80,6 +72,8 @@
 								attr = _this._deserialize(attr);
 							}
 							_this[key] = attr;
+							_this.node[key] = attr;
+
 						}
 
 					})(this, keys[i]);
@@ -100,23 +94,24 @@
 
 				for (var i = mutations.length - 1; i >= 0; i--) {
 					var m = mutations[i];
-					// console.log('_attrMutationHandler', m.attributeName, this.getAttribute(m.attributeName));
 					var value = this.getAttribute(m.attributeName);
-					this[m.attributeName] = this._deserialize(value);
+					this[m.attributeName] = this._deserialize(value, this[m.attributeName]);
+					// console.log('_attrMutationHandler', m.attributeName, this.getAttribute(m.attributeName), this[m.attributeName]);
 				}
 			},
 
 			// convert string to array, number, or boolean
-			_deserialize: function(value){
+			_deserialize: function(value, currentValue){
 				// console.log('_deserialize', value);
 
 				//TODO: cache or infer type
-				if(value === 'true') return true;
+				if(typeof currentValue == 'string') return value;
+				else if(value === 'true') return true;
 				else if(value === 'false') return false;
-				else if(typeof value === 'string') return value;
 				else if(!isNaN(Number(value))) return Number(value);
+				// else if(currentValue instanceof Array) return value.split(','); // array
 				else if(value.split(',').length > 0) return value.split(','); // array
-				else return null;
+				else return value;
 			},
 
 		});

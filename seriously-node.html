@@ -12,22 +12,26 @@
 
 		Polymer('seriously-node', {
 
-			publish: { // probably gets overwritten, but good for reference
+			publish: {
 				node: undefined,
-				debug: false,
-				_seriously: {}, // managed by seriously-graph
+				off: false,			// if off, won't be included in the chain
+				_seriously: {}, 	// managed by seriously-graph
 			},
 
+			offChanged: function(){
+				// console.log('seriously-node.offChanged');
+				this.fire('off-changed');
+			},
 
 			// linear graph methods
 			//
 			
 			moveUp: function(){
-				//TODO: move up/back in node list
+				this.parentNode.insertBefore(this, this.previousSibling); // move up/back in node list
 			},
 			
 			moveDown: function(){
-				//TODO: move down/forward in node list
+				this.nextElementSibling.insertAdjacentElement('afterEnd', this); // move down/forward in node list
 			},
 
 		});

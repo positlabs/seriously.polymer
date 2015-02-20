@@ -2,16 +2,56 @@
 	<head>
 		
 		<script src="./bower_components/Seriously.js/seriously.js"></script>
+		<script src="./bower_components/Seriously.js/effects/seriously.edge.js"></script>
 		<script src="./bower_components/Seriously.js/effects/seriously.pixelate.js"></script>
 		<script src="./bower_components/Seriously.js/effects/seriously.blur.js"></script>
+		<script src="./bower_components/Seriously.js/effects/seriously.brightness-contrast.js"></script>
+		<script src="./bower_components/Seriously.js/effects/seriously.bleach-bypass.js"></script>
 
 		<script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
 		<link rel="import" href="./bower_components/polymer/polymer.html">
-		<link rel="import" href="./demo-component.html">
+		<link rel="import" href="seriously-components.html">
 
 	</head>
 
 	<body fullbleed unresolved>
+
+		<polymer-element name="demo-component">
+
+			<template>
+				
+				<seriously-graph linear>
+					<seriously-source>
+						<img src="images/pencils.jpg">
+					</seriously-source>
+					<seriously-effect type="blur" amount="{{ blurAmt }}" off="{{!blurOn}}"></seriously-effect>
+					<seriously-effect type="brightness-contrast" contrast="3" off="{{!bcOn}}"></seriously-effect>
+					<seriously-effect type="bleach-bypass" off="{{!bleachOn}}"></seriously-effect>
+					<seriously-effect type="edge" off="{{!edgeOn}}"></seriously-effect>
+					<seriously-target width="411" height="425"></seriously-target>
+				</seriously-graph>
+
+				<p>inspect me and re-order the effect nodes!</p>
+
+				<input type="range" value="{{blurAmt}}" min="0.0" max=".50" step=".01">
+				<input type="checkbox" checked="{{ blurOn }}" >
+				<input type="checkbox" checked="{{ bcOn }}" >
+				<input type="checkbox" checked="{{ bleachOn }}" >
+				<input type="checkbox" checked="{{ edgeOn }}" >
+
+			</template>
+
+			<script>
+				Polymer('demo-component', {
+
+					ready: function(){
+						this.blurAmt = .3;
+						this.blurOn = true;
+					},
+				});
+			</script>
+
+		</polymer-element>
 		<demo-component></demo-component>
 	</body>
 	

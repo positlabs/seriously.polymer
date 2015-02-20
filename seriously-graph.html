@@ -1,4 +1,3 @@
-<link rel="import" href="./seriously-node.html">
 
 <!-- 
 
@@ -41,14 +40,18 @@
 			//
 
 			publish: {
-				linear: false // daisy chain nodes. default is to look for sourceID
+				linear: false, 			// daisy chain nodes. default is to assign source
+				onframe: function(){},	// reqanimframe callback
 			},
 
-			ready: function(){
-
+			created: function(){
+				this._onNodeDisabledChanged = this._onNodeDisabledChanged.bind(this);
+				this._onFrame = this._onFrame.bind(this);
 			},
 
 			domReady: function(){
+				// console.dir(this)
+
 				var srsly = this.seriously = new Seriously();
 
 				var nodes = this._getNodes();
@@ -60,9 +63,8 @@
 				setTimeout(function(){ 
 					this._connectNodes();
 					this.onMutation(this, this._mutated);
+					this.seriously.go(this._onFrame);
 				}.bind(this), 1);
-
-				this.seriously.go();
 			},
 
 
@@ -79,24 +81,56 @@
 			// private
 			//
 
+			_onFrame: function(time){
+				// console.log(this.onframe);
+				// this.fire('frame', time);
+				this.onframe(time);
+			},
+
 			_getNodes: function(){
 				// NOTE: might need to use a different method for this to ensure order is maintained.
-				return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+				return Array.prototype.slice.call(this.children);
+				// return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
+			},
+
+			_getActiveNodes: function(fromNodes){
+				fromNodes = fromNodes || this._getNodes();
+				return fromNodes.filter(function(node){
+					if(!node.off) return node;
+				});
 			},
 
 			_connectNodes: function(){
-				var nodes = this._getNodes();
+				console.log('\nseriously-graph._connectNodes');
 
 				// FIXME: how can we prevent the cyclical ref error produced by seriously?
 				// tried setting all node.source's to undefined.
 				// tried stopping seriously before source assignment, restarting after new source assignments
 
 				if(this.linear){ // daisy chain
-					for (var i = 1; i < nodes.length; i++) {
-						nodes[i].source = nodes[i-1];
-					}
+					this.job('connectNodes', function(){ // debounce
+
+						// listen for node events
+						var allNodes = this._getNodes();
+						for (var i = 1; i < allNodes.length; i++) {
+							allNodes[i].removeEventListener('off-changed', this._onNodeDisabledChanged);
+							allNodes[i].addEventListener('off-changed', this._onNodeDisabledChanged);
+						}
+
+						// connect active nodes
+						var activeNodes = this._getActiveNodes(allNodes);
+						for (var i = 1; i < activeNodes.length; i++) {
+							console.log('\tconnecting', activeNodes[i-1].type, 'to', activeNodes[i].type);
+							activeNodes[i].source = activeNodes[i-1];
+						}
+					}.bind(this), 10);
 				}
 
+			},
+
+			_onNodeDisabledChanged: function(){
+				console.log('seriously-graph._onNodeDisabledChanged');
+				this._connectNodes();
 			},
 
 			_mutated: function(){

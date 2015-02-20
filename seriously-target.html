@@ -11,23 +11,19 @@
 		Polymer('seriously-target', {
 	
 			publish: {
-				node: undefined,
 				width: 300,
 				height: 150,
 				source: {},
-				_source: {},	// managed by seriously-graph
-				_seriously: {}, // managed by seriously-graph
+				type: 'target', // doesn't do anything...
 			},
 
 			sourceChanged: function(){
-				console.log('seriously-target.sourceChanged', this.source);
+				// console.log('seriously-target.sourceChanged', this.source);
 				if(this.node) this.node.source = this.source.node;
 			},
 
 			_seriouslyChanged: function(){
 				this.node = this._seriously.target(this.$.canvas);
-				// if(this.source) this.node.source = this.source.node;
-				// if(this.source && this.source.node) this.node.source = this.source.node;
 			},
 
 		});
