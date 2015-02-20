@@ -100,19 +100,14 @@
 						nodes[i]._source = nodes[i-1].node;
 					}
 
-				}else{ // connect nodes based on sourceID
+				// }else{ // connect nodes based on sourceID
 
-					nodes.forEach(function(node){
-						if(node.sourceID){
-							node._source = this.querySelector('#' + node.sourceID).node;
-						}
-					}.bind(this));
+					// nodes.forEach(function(node){
+					// 	if(node.sourceID){
+					// 		node._source = this.querySelector('#' + node.sourceID).node;
+					// 	}
+					// }.bind(this));
 				}
-
-				nodes.forEach(function(node){
-					node.removeEventListener('sourceIDChanged', this._onNodeSourceIDChanged); // ensure listeners don't get doubled up
-					node.addEventListener('sourceIDChanged', this._onNodeSourceIDChanged);
-				}.bind(this));
 
 			},
 

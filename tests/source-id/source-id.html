@@ -4,18 +4,17 @@
 		
 		<seriously-graph>
 			
-			<seriously-source id="source-1">
+			<seriously-source id="source1">
 				<img src="../../images/robot.jpg">
 			</seriously-source>
 
-			<seriously-source id="source-2">
+			<seriously-source id="source2">
 				<img src="../../images/pencils.jpg">
 			</seriously-source>
 
-			<seriously-effect id="blurNode" sourceID="source-1" type="blur" amount=".5"></seriously-effect>
-			<seriously-effect id="pixelate" sourceID="blurNode" type="pixelate"></seriously-effect>
-			
-			<seriously-target id="target" sourceID="pixelate" width="411" height="425"></seriously-target>
+			<seriously-effect type="blur" id="blurNode" source="{{$.source1}}" amount=".5"></seriously-effect>
+			<seriously-effect type="pixelate" id="pixelate" source="{{$.blurNode}}" ></seriously-effect>
+			<seriously-target id="target" source="{{$.pixelate}}" width="411" height="425"></seriously-target>
 
 		</seriously-graph>
 
@@ -28,11 +27,11 @@
 			ready: function(){
 
 				setTimeout(function(){
-					this.$.blurNode.sourceID = 'source-2';
+					this.$.blurNode.source = this.$.source2;
 				}.bind(this), 1000);
 
 				setTimeout(function(){
-					this.$.target.sourceID = 'source-1';
+					this.$.target.source = this.$.source1;
 				}.bind(this), 3000);
 
 			},

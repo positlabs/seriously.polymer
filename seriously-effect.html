@@ -32,9 +32,10 @@
 		Polymer('seriously-effect', {
 
 			publish: {
-				node: {},		// instance of the effect
+				node: undefined,// instance of the effect
 				type: '',		// type of effect. used to generate effect instance
-				sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
+				source: '', 	// input component.
+				// sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
 				debug: false,	// shows controls for node properties
 				_source: {}, 	// the actual Source object. managed by seriously-graph
 				_seriously: {}, // instance of Seriously. managed by seriously-graph
@@ -44,19 +45,16 @@
 				this._attrMutationHandler = this._attrMutationHandler.bind(this);
 			},
 
-			sourceIDChanged: function(){
-				// console.log('seriously-effect.sourceIDChanged', this.sourceID);
-				this.fire('sourceIDChanged', {sourceID: this.sourceID});
-			},
-
-			_sourceChanged: function(){
-				// console.log('seriously-effect._sourceChanged');
-				this.node.source = this._source;
+			sourceChanged: function(){
+				// console.log('seriously-effect.sourceChanged', this.source.node);
+				if(this.node) this.node.source = this.source.node;
 			},
 
 			_seriouslyChanged: function(){
-				// console.log('seriously-effect.seriouslyChanged');
+				// console.log('seriously-effect.seriouslyChanged', this.source.node);
 				this.node = this._seriously.effect(this.type); // invalidate node
+				if(this.source) this.node.source = this.source.node;
+
 				this._setupAttributes();
 			},
 
