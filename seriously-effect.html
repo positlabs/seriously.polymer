@@ -17,16 +17,6 @@
 			
 			wrapper for seriously.effect nodes
 
-
-			TODO 	serialize attributes
-						- boolean
-						- number
-						- array
-						- string
-
-			possible we only need to detect arrays. other types may work as-is.
-
-
 		*/
 
 		Polymer('seriously-effect', {
@@ -35,9 +25,7 @@
 				node: undefined,// instance of the effect
 				type: '',		// type of effect. used to generate effect instance
 				source: '', 	// input component.
-				// sourceID: '', 	// id of input node. used by seriously-graph to connect nodes
 				debug: false,	// shows controls for node properties
-				_source: {}, 	// the actual Source object. managed by seriously-graph
 				_seriously: {}, // instance of Seriously. managed by seriously-graph
 			},
 
@@ -55,48 +43,80 @@
 				this.node = this._seriously.effect(this.type); // invalidate node
 				if(this.source) this.node.source = this.source.node;
 
-				this._setupAttributes();
+				this._publishAttributes(this.node.inputs());
 			},
 
-			// set up mutationObserver for attributes and assign initial values
-			_setupAttributes: function(){
-				// console.log('seriously-effect._setupAttributes', this.type);
+			_publishAttributes: function(attrs){
 
-				var inputs = this.node.inputs(),
-					keys = Object.keys(inputs),
+				var keys = Object.keys(attrs),
 					watchKeys = [];
 
 				for (var i = keys.length - 1; i >= 0; i--) {
-					var key = keys[i];
-					if(key !== 'source'){ // source assignment is automated by seriously-graph
-						if(this.attributes[key] !== undefined) {
-							this.node[key] = this.attributes[key].value; // copy props to node
+
+					(function(_this, key){
+
+						if(key !== 'source'){ // blacklist. source is a published attribute
+
+							var lcKey = key.toLowerCase()
+							watchKeys.push(lcKey); // attribute names are always lowercase
+
+							// define prop accessors
+							Object.defineProperty(_this, lcKey, {
+								get: function() {
+									// console.log('getting', key, this[key+'_']);
+									return _this[key+'_'];
+								},
+								set: function(value) {
+									// console.log('setting', key, 'to', value);
+									_this[key+'_'] = value;
+									_this.node[key] = value;
+								},
+							});
+
+							var attr = _this.getAttribute(key);
+							if(attr == null){
+								attr = attrs[key];
+							}else{
+								attr = _this._deserialize(attr);
+							}
+							_this[key] = attr;
 						}
-						watchKeys.push(key.toLowerCase()); // attribute names are always lowercase
-					}
+
+					})(this, keys[i]);
+
 				}
 
+				// listen for attribute changes
 				if(this.attrObserver) this.attrObserver.close();
-				this.attrObserver = new MutationObserver(this._attrMutationHandler);
+				this.attrObserver = new MutationObserver(this._attrMutationHandler.bind(this));
 				this.attrObserver.observe(this, {
 					attributes: true,
-					subtree: false,
-					childList: false,
-					characterData: false,
-					attributeOldValue: false,
 					attributeFilter: watchKeys,
 				});
 
 			},
 
 			_attrMutationHandler: function(mutations){
-				// console.log('seriously-effect._mutationHandler', mutations);
 
 				for (var i = mutations.length - 1; i >= 0; i--) {
-					var m = mutations[i],
-						value = this.attributes[m.attributeName].value;
-					this.node[m.attributeName] = value;
-				};
+					var m = mutations[i];
+					// console.log('_attrMutationHandler', m.attributeName, this.getAttribute(m.attributeName));
+					var value = this.getAttribute(m.attributeName);
+					this[m.attributeName] = this._deserialize(value);
+				}
+			},
+
+			// convert string to array, number, or boolean
+			_deserialize: function(value){
+				// console.log('_deserialize', value);
+
+				//TODO: cache or infer type
+				if(value === 'true') return true;
+				else if(value === 'false') return false;
+				else if(typeof value === 'string') return value;
+				else if(!isNaN(Number(value))) return Number(value);
+				else if(value.split(',').length > 0) return value.split(','); // array
+				else return null;
 			},
 
 		});

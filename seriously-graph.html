@@ -8,8 +8,8 @@
 		<seriously-source id="source" >
 			<img src="images/pencils.jpg" >
 		</seriously-source>
-		<seriously-effect id="pxl8" sourceID="source" type="pixelate" ></seriously-effect>
-		<seriously-target id="target" sourceID="pxl8" ></seriously-target>
+		<seriously-effect id="pxl8" source="{{$.source}}" type="pixelate" ></seriously-effect>
+		<seriously-target id="target" source="{{$.pxl8}}" ></seriously-target>
 	</seriously-graph>
 
 
@@ -37,7 +37,6 @@
 
 		Polymer('seriously-graph', {
 
-			//
 			// lifecycle and definition
 			//
 
@@ -46,7 +45,7 @@
 			},
 
 			ready: function(){
-				this._onNodeSourceIDChanged = this._onNodeSourceIDChanged.bind(this);
+
 			},
 
 			domReady: function(){
@@ -57,7 +56,8 @@
 					node._seriously = srsly;
 				});
 
-				setTimeout(function(){ // waiting for change listeners to fire after setting seriously instance on nodes
+				// waiting for change listeners to fire after setting seriously instance on nodes
+				setTimeout(function(){ 
 					this._connectNodes();
 					this.onMutation(this, this._mutated);
 				}.bind(this), 1);
@@ -66,18 +66,16 @@
 			},
 
 
-			//
 			// public
 			//
 
 			export: function(){
 				
-				//TODO: return a string of vanilla js that is equivalent to the current graph.
+				//TODO: return a pretty string of vanilla js that is equivalent to the current graph.
 
 			},
 
 
-			//
 			// private
 			//
 
@@ -86,7 +84,6 @@
 				return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
 			},
 
-			// TODO: might be prudent to debounce this
 			_connectNodes: function(){
 				var nodes = this._getNodes();
 
@@ -95,25 +92,11 @@
 				// tried stopping seriously before source assignment, restarting after new source assignments
 
 				if(this.linear){ // daisy chain
-
 					for (var i = 1; i < nodes.length; i++) {
-						nodes[i]._source = nodes[i-1].node;
+						nodes[i].source = nodes[i-1];
 					}
-
-				// }else{ // connect nodes based on sourceID
-
-					// nodes.forEach(function(node){
-					// 	if(node.sourceID){
-					// 		node._source = this.querySelector('#' + node.sourceID).node;
-					// 	}
-					// }.bind(this));
 				}
 
-			},
-
-			_onNodeSourceIDChanged: function(){
-				// console.log('seriously-graph.onNodeSourceIDChanged', this);
-				this._connectNodes();
 			},
 
 			_mutated: function(){

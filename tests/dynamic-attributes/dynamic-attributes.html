@@ -88,7 +88,7 @@
 			_deserialize: function(value){
 				// console.log('_deserialize', value);
 
-				//TODO: cache type
+				//TODO: infer type
 				if(value === 'true') return true;
 				else if(value === 'false') return false;
 				else if(typeof value === 'string') return value;

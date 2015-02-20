@@ -19,14 +19,15 @@
 				_seriously: {}, // managed by seriously-graph
 			},
 
-			_seriouslyChanged: function(){
-				this.node = this._seriously.target(this.$.canvas);
-				if(this.source) this.node.source = this.source.node;
-			},
-
 			sourceChanged: function(){
 				console.log('seriously-target.sourceChanged', this.source);
 				if(this.node) this.node.source = this.source.node;
+			},
+
+			_seriouslyChanged: function(){
+				this.node = this._seriously.target(this.$.canvas);
+				// if(this.source) this.node.source = this.source.node;
+				// if(this.source && this.source.node) this.node.source = this.source.node;
 			},
 
 		});

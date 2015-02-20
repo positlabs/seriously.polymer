@@ -19,7 +19,7 @@
 				<img src="images/pencils.jpg">
 			</seriously-source>
 			<seriously-effect type="pixelate" pixelsize="{{pixelSize}}"></seriously-effect>
-			<seriously-effect type="blur" amount="{{blurAmt}}" asdf="{{ {hello: 'world'} }}"></seriously-effect>
+			<seriously-effect type="blur" amount="{{blurAmt}}"></seriously-effect>
 			<seriously-target width="411" height="425"></seriously-target>
 		</seriously-graph>
 
@@ -30,13 +30,17 @@
 	<script>
 		Polymer('demo-component', {
 
+			publish: {
+				// pixelSize: [5, 5]
+			},
+
 			ready: function(){
-				this.pixelSize = [1, 1];
+				this.pixelSize = [5, 5];
 				this.blurAmt = 0;
 
 				// testing changes within a properties object.
 				setTimeout(function(){
-					this.pixelSize = [20, 1];
+					this.pixelSize = [20, 20];
 					this.blurAmt = .4;
 				}.bind(this), 1000);
 
