@@ -24,20 +24,37 @@
 					<seriously-source>
 						<img src="images/pencils.jpg">
 					</seriously-source>
-					<seriously-effect type="blur" amount="{{ blurAmt }}" off="{{!blurOn}}"></seriously-effect>
-					<seriously-effect type="brightness-contrast" contrast="3" off="{{!bcOn}}"></seriously-effect>
-					<seriously-effect type="bleach-bypass" off="{{!bleachOn}}"></seriously-effect>
-					<seriously-effect type="edge" off="{{!edgeOn}}"></seriously-effect>
+					<seriously-effect type="blur" amount="{{ blurAmt }}" off="{{ !blurOn }}"></seriously-effect>
+					<seriously-effect type="brightness-contrast" contrast="{{ contrast }}" brightness="{{ brightness }}" off="{{ !bcOn }}"></seriously-effect>
+					<seriously-effect type="bleach-bypass" off="{{ !bleachOn }}"></seriously-effect>
+					<seriously-effect type="edge" off="{{ !edgeOn }}"></seriously-effect>
 					<seriously-target width="411" height="425"></seriously-target>
 				</seriously-graph>
 
 				<p>inspect me and re-order the effect nodes!</p>
 
-				<input type="range" value="{{blurAmt}}" min="0.0" max=".50" step=".01">
-				<input type="checkbox" checked="{{ blurOn }}" >
-				<input type="checkbox" checked="{{ bcOn }}" >
-				<input type="checkbox" checked="{{ bleachOn }}" >
-				<input type="checkbox" checked="{{ edgeOn }}" >
+				<div class="control">
+					<span>blur</span>
+					<input type="checkbox" checked="{{ blurOn }}" name="blur">
+					<input type="range" value="{{ blurAmt }}" min="0.0" max=".50" step=".01">
+				</div>
+
+				<div class="control">
+					<span>brightness/contrast</span>
+					<input type="checkbox" checked="{{ bcOn }}" name="contrast">
+					<input type="range" value="{{ contrast }}" min="0" max="10" step=".1">
+					<input type="range" value="{{ brightness }}" min="0" max="10" step=".1">
+				</div>
+
+				<div class="control">
+					<span>bleach</span>
+					<input type="checkbox" checked="{{ bleachOn }}">
+				</div>
+
+				<div class="control">
+					<span>edge</span>
+					<input type="checkbox" checked="{{ edgeOn }}" >
+				</div>
 
 			</template>
 
@@ -45,8 +62,11 @@
 				Polymer('demo-component', {
 
 					ready: function(){
-						this.blurAmt = .3;
+						this.blurAmt = .1;
 						this.blurOn = true;
+						this.brightness = 1;
+						this.bcOn = true;
+						this.contrast = 3;
 					},
 				});
 			</script>

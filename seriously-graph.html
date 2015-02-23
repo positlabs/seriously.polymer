@@ -101,11 +101,7 @@
 			},
 
 			_connectNodes: function(){
-				console.log('\nseriously-graph._connectNodes');
-
-				// FIXME: how can we prevent the cyclical ref error produced by seriously?
-				// tried setting all node.source's to undefined.
-				// tried stopping seriously before source assignment, restarting after new source assignments
+				// console.log('\nseriously-graph._connectNodes');
 
 				if(this.linear){ // daisy chain
 					this.job('connectNodes', function(){ // debounce
@@ -120,8 +116,13 @@
 						// connect active nodes
 						var activeNodes = this._getActiveNodes(allNodes);
 						for (var i = 1; i < activeNodes.length; i++) {
-							console.log('\tconnecting', activeNodes[i-1].type, 'to', activeNodes[i].type);
-							activeNodes[i].source = activeNodes[i-1];
+							// console.log('\tconnecting', activeNodes[i-1].type, 'to', activeNodes[i].type);
+
+							(function(i){
+								setTimeout(function(){ // prevents cyclical ref error from Seriously
+									activeNodes[i].source = activeNodes[i-1];
+								}, 1);
+							})(i);
 						}
 					}.bind(this), 10);
 				}
@@ -129,7 +130,7 @@
 			},
 
 			_onNodeDisabledChanged: function(){
-				console.log('seriously-graph._onNodeDisabledChanged');
+				// console.log('seriously-graph._onNodeDisabledChanged');
 				this._connectNodes();
 			},
 
