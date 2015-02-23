@@ -22,14 +22,13 @@
     "polymer": "Polymer/polymer#~0.5.4",
     "Seriously.js": "git@github.com:brianchirls/Seriously.js.git"
   },
-  "_release": "aa1997a581",
+  "_release": "8711beee3e",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "aa1997a581fbee4ab6da3801b4c98190f5269f4c"
+    "commit": "8711beee3e9a40fd5095d758b260fb9a99a0d04d"
   },
   "_source": "git@github.com:positlabs/seriously.polymer.git",
   "_target": "*",
-  "_originalSource": "git@github.com:positlabs/seriously.polymer.git",
-  "_direct": true
+  "_originalSource": "git@github.com:positlabs/seriously.polymer.git"
 }

@@ -1,39 +1,54 @@
+
+<link rel="import" href="./seriously-node.html">
+
 <!-- 
 
 	// nest the element you want to use as the source
 	//
 
-	<seriously-source id="source">
+	<seriously-source>
 		<img src="images/pencils.jpg">
 	</seriously-source>
 
-	<seriously-source id="source">
+	<seriously-source>
 		<video src="videos/motionpicture.mp4" loop muted autoplay>
+	</seriously-source>	
+
+	<seriously-source>
+		<canvas>
 	</seriously-source>
 
-	...etc
+
+	OR....................
+	...etc?????
+
+	array
+	camera
+	depth
+	imagedata
+	three
+	
  -->
 
-<polymer-element name="seriously-source">
+<polymer-element name="seriously-source" extends="seriously-node">
 	
-	<template>
-		<div hidden>
-			<content></content>
-		</div>
-	</template>
+	<template></template>
 
 	<script>
+
+		/**
+
+			TODO: handle more source types
+			
+		*/
 		
 		Polymer('seriously-source', {
 
 			publish: {
-				node: {},
-				_seriously: {}, // managed by seriously-graph
+				type: 'source',
 			},
 
 			_seriouslyChanged: function(){
-				// could have src on the component and detect filetype, but seriously already does type detection. 
-				// Keeping it simple this way.
 				this.node = this._seriously.source(this.children[0]);
 			}
 

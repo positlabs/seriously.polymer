@@ -1,0 +1,41 @@
+<!-- 
+
+	common methods for seriously components
+	
+ -->
+
+<polymer-element name="seriously-node">
+	
+	<template></template>
+
+	<script>
+
+		Polymer('seriously-node', {
+
+			publish: {
+				node: undefined,
+				off: false,			// if off, won't be included in the chain
+				_seriously: {}, 	// managed by seriously-graph
+			},
+
+			offChanged: function(){
+				// console.log('seriously-node.offChanged');
+				this.fire('off-changed');
+			},
+
+			// linear graph methods
+			//
+			
+			moveUp: function(){
+				this.parentNode.insertBefore(this, this.previousSibling); // move up/back in node list
+			},
+			
+			moveDown: function(){
+				this.nextElementSibling.insertAdjacentElement('afterEnd', this); // move down/forward in node list
+			},
+
+		});
+
+	</script>
+
+</polymer-element>
