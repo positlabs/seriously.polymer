@@ -83,14 +83,12 @@
 
 			_onFrame: function(time){
 				// console.log(this.onframe);
-				// this.fire('frame', time);
 				this.onframe(time);
 			},
 
 			_getNodes: function(){
-				// NOTE: might need to use a different method for this to ensure order is maintained.
+				// console.log('_getNodes', Array.prototype.slice.call(this.children))
 				return Array.prototype.slice.call(this.children);
-				// return Array.prototype.slice.call(this.querySelectorAll('seriously-source, seriously-target, seriously-effect'));
 			},
 
 			_getActiveNodes: function(fromNodes){
@@ -103,15 +101,16 @@
 			_connectNodes: function(){
 				// console.log('\nseriously-graph._connectNodes');
 
-				if(this.linear){ // daisy chain
-					this.job('connectNodes', function(){ // debounce
+				this.job('connectNodes', function(){ // debounce
 
-						// listen for node events
-						var allNodes = this._getNodes();
-						for (var i = 1; i < allNodes.length; i++) {
-							allNodes[i].removeEventListener('off-changed', this._onNodeDisabledChanged);
-							allNodes[i].addEventListener('off-changed', this._onNodeDisabledChanged);
-						}
+					// listen for node events
+					var allNodes = this._getNodes();
+					for (var i = 1; i < allNodes.length; i++) {
+						allNodes[i].removeEventListener('off-changed', this._onNodeDisabledChanged);
+						allNodes[i].addEventListener('off-changed', this._onNodeDisabledChanged);
+					}
+	
+					if(this.linear){ // daisy chain
 
 						// connect active nodes
 						var activeNodes = this._getActiveNodes(allNodes);
@@ -119,13 +118,13 @@
 							// console.log('\tconnecting', activeNodes[i-1].type, 'to', activeNodes[i].type);
 
 							(function(i){
-								setTimeout(function(){ // prevents cyclical ref error from Seriously
+								setTimeout(function(){ // prevents cyclical ref error from Seriously, but seems hacky
 									activeNodes[i].source = activeNodes[i-1];
 								}, 1);
 							})(i);
 						}
-					}.bind(this), 10);
-				}
+					}
+				}.bind(this), 10);
 
 			},
 
