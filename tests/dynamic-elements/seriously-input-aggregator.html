@@ -1,0 +1,105 @@
+<html>
+	
+	<head>
+
+		<script src="../../bower_components/Seriously.js/seriously.js"></script>
+		<link rel="import" href="../../demos/all-effects.html">
+		
+	</head>
+
+	<body>
+		
+		<script>
+
+
+			var effectNames = [
+				'accumulator',
+				'ascii',
+				'bleach-bypass',
+				'blend',
+				'blur',
+				'brightness-contrast',
+				'channels',
+				'checkerboard',
+				'chroma',
+				'color-select',
+				'color',
+				'colorcomplements',
+				'colorcube',
+				'crop',
+				'daltonize',
+				'directionblur',
+				'displacement',
+				'dither',
+				'edge',
+				'emboss',
+				'exposure',
+				'expression',
+				'fader',
+				'falsecolor',
+				'filmgrain',
+				'freeze',
+				'fxaa',
+				'gradientwipe',
+				'hex',
+				'highlights-shadows',
+				'hue-saturation',
+				'invert',
+				'kaleidoscope',
+				'layers',
+				'linear-transfer',
+				'lumakey',
+				'mirror',
+				'nightvision',
+				'noise',
+				'panorama',
+				'pixelate',
+				'polar',
+				'ripple',
+				'scanlines',
+				'select',
+				'sepia',
+				'simplex',
+				'sketch',
+				'split',
+				'throttle',
+				'tone',
+				'tvglitch',
+				'vibrance',
+				'vignette',
+				'whitebalance',
+			];
+
+			var effectInputSet = {};
+
+			window.onload = function(){
+
+				var s = new Seriously();
+
+				effectNames.forEach(function(effectName){
+					var inputs = s.effect(effectName).inputs();
+					// console.log('\n', effectName)
+					Object.keys(inputs).forEach(function(inputName){
+
+						var input = inputs[inputName];
+						// console.log('\t', inputName, input);
+
+						// assuming two input names won't be the same and have different value types
+						if(effectInputSet[inputName] != undefined) return;
+
+						var defaultVal = input.defaultValue;
+						if(input.type == "image") defaultVal = {};
+						effectInputSet[inputName] = defaultVal;
+
+					});
+				});
+
+				console.log(JSON.stringify(effectInputSet));
+				// console.log(effectInputSet);
+			};
+
+		</script>
+
+	</body>
+
+</html>
