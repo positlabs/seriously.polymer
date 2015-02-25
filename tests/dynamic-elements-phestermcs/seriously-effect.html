@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<polymer-element name="seriously-effect">
+	<script>
+		(function () {
+			var seriouslyMock = {
+				effect: function (name) {
+					switch (name) {
+						case 'pixelate':
+							return {
+								inputs: function () {
+									return ['pixelSize'];
+								},
+								pixelSize: 0
+							};
+						case 'blur':
+							return {
+								inputs: function () {
+									return ['amount'];
+								},
+								amount: 0.0
+							};
+					}
+				}
+			};
+		
+			var seriously = seriouslyMock;
+			// collect all the seriously-effect-<<type>> <polymer-elements> into here
+			var elements = document.body.appendChild(document.createElement('seriously-effect-types'));
+			var types = {};
+			Polymer({
+				created: function () {
+					if (this.hasAttribute('type')) this.init();
+				},
+		
+				// imperative createElement('seriously-effect') would then require call to init() to complete
+				init: function () {
+					var name = this._ensureElement();
+					if (!name) return;
+		
+					// get mustache bindings before they get parsed and bound
+					var instanceDecl = '<' + name + ' ';
+					var attrs = this.attributes;
+					for(var i = 0, l = attrs.length, attr; attr = attrs[i], i < l; ++i)
+						if(attr.name !== 'type') instanceDecl += attr.name + '="' + attr.value + '" ';
+					instanceDecl += '></' + name + '>';
+		
+					// and save
+					this._effectInstanceDecl = instanceDecl;
+				},
+		
+				ready: function() {
+					// <seriously-effect>s should always be created from template stamping
+					var parentNode = this.parentNode;
+					var templateCreator;
+					while(parentNode)
+						if(parentNode.templateCreator_) {
+							templateCreator = parentNode.templateCreator_;
+							break;
+						}
+						else
+							parentNode = parentNode.parentNode;
+		
+					if(templateCreator) this._effectInstance = templateCreator.injectBoundHTML(this._effectInstanceDecl);
+				},
+		
+				domReady: function() {
+					// abracadabra, presto chango!
+					this.parentNode.insertBefore(this._effectInstance, this);
+					this.parentNode.removeChild(this);
+				},
+		
+				_ensureElement: function () {
+					if (!this.hasAttribute('type')) {
+						console.warn('<seriously-effect> has to \'type\' attribute.');
+						return null;
+					}
+		
+					var type = this.getAttribute('type');
+					var name = 'seriously-effect-' + type;
+					if (types[type]) return name;
+					types[type] = true;
+		
+					// create a temp instance of effect, only to get list of its possible inputs
+					var effect = seriously.effect(type);
+					if (!effect) {
+						console.warn('Seriously effect \'' + type + '\' does not exist.');
+						return null;
+					}
+					var inputs = effect.inputs();
+		
+					// make a polymer-element decl for new effect element
+					var declaration =
+						'<polymer-element ' +
+							'name="' + name + '" ' +
+							'attributes="' + inputs.join(' ') + '" ' +
+						'></polymer-element>';
+					var makeElement = document.createElement('div');
+					makeElement.innerHTML = declaration;
+					elements.appendChild(makeElement.children[0]);
+		
+					var proto = {};
+		
+					(function (type) {
+						proto.created = function() {
+							this.effect = seriously.effect(type);
+						}
+					})(type);
+		
+					for(var i = 0, l = inputs.length, inputName; inputName = inputs[i], i < l; ++i)
+						(function (inputName) {
+							proto[inputName + 'Changed'] = function (oldValue, newValue) {
+								// or whatever imperative way to set effect's attribute that causes effect to change
+								this.effect[inputName] = newValue;
+								// just to prove it works!
+								this.innerHTML = newValue;
+							}
+						})(inputName);
+		
+					Polymer(name, proto);
+		
+					return name;
+				}
+			});
+		})();
+	</script>
+</polymer-element>
