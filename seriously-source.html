@@ -48,7 +48,8 @@
 				type: 'source',
 			},
 
-			_seriouslyChanged: function(){
+			domReady: function(){
+				this._seriously = this.parentNode.seriously;
 				this.node = this._seriously.source(this.children[0]);
 			}
 
