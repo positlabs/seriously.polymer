@@ -14,7 +14,7 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "node_modules",
+    "node_modules"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#~0.5.4",
