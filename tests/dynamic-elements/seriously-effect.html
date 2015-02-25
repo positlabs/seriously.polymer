@@ -37,9 +37,9 @@
 					var inputs = seriously.effect(this.type).inputs();
 					Object.keys(inputs).map(function(inputName){
 						if(inputs[inputName].type == 'image'){
-							publish[inputName.toLowerCase()] = {};
+							publish[inputName] = {};
 						}else{
-							publish[inputName.toLowerCase()] = inputs[inputName].defaultValue;
+							publish[inputName] = inputs[inputName].defaultValue;
 						}
 					});
 
@@ -56,6 +56,8 @@
 							
 						},
 					});
+
+					//TODO: make nameChanged handlers because serialization
 
 					return false;
 				}
