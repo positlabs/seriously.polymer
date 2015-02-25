@@ -20,7 +20,6 @@
 
 			created: function(){
 				// console.log('element-generator.created', this.getAttribute('type'), this.attributes.array());
-				this.attrs = this.attributes.array();
 				this.name = 'seriously-effect-'+this.getAttribute('type');
 			},
 			
@@ -31,7 +30,12 @@
 
 					// template
 					var tmplString = '<polymer-element name="'+this.name+'"><template></template></polymer-element>';
+					// document.body.innerHTML += tmplString;
 					document.head.innerHTML += tmplString;
+					// setTimeout(function(){
+					// 	console.log(document.head.querySelector('polymer-element[name="'+this.name+'"]'));
+					// 	document.head.querySelector('polymer-element[name="'+this.name+'"]').remove();
+					// }.bind(this), 1);
 
 					// assemble publishable stuff
 					var publish = {type: this.type};
@@ -46,15 +50,12 @@
 
 					console.log('registering', this.name, publish);
 
-					setTimeout(function(){ // waiting for template html to parse. else polymer borks
-						// register prototype
-						Polymer(this.name, {
-							publish: publish,
-							ready: function(){
-								console.log('ready!', publish);
-							},
-						});
-					}.bind(this), 1);
+					Polymer(this.name, {
+						publish: publish,
+						ready: function(){
+							console.log('ready!', publish);
+						},
+					});
 
 					return false;
 				}
@@ -65,16 +66,14 @@
 				// console.log('element-generator.domReady', this.name);
 
 				var initialized = this._elementDeclaration();
-				if(!initialized) return;
-
+				// if(!initialized) return;
+			
 				var effectInstance = document.createElement(this.name);
-				this.attrs.map(function(attr){
-					// effectInstance[attr.name] = this[attr.name];
+				this.attributes.array().map(function(attr){
 					effectInstance.setAttribute(attr.name, this[attr.name]);
 				}.bind(this));
 				this.parentNode.insertBefore(effectInstance, this);
 				this.remove();
-
 			},
 
 		});
