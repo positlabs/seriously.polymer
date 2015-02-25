@@ -1,0 +1,49 @@
+<link rel="import" href="./seriously-node.html">
+	
+<polymer-element name="seriously-target" extends="seriously-node">
+	
+	<template>
+		<canvas id="canvas" width="{{width}}" height="{{height}}"></canvas>
+	</template>
+
+	<script>
+
+		Polymer('seriously-target', {
+	
+			publish: {
+				width: 300,
+				height: 150,
+				source: null,
+				type: 'target', // doesn't do anything...
+			},
+
+			domReady: function(){
+				this._seriously = this.parentNode.seriously;
+				this.node = this._seriously.target(this.$.canvas);
+			},
+
+			sourceChanged: function(){
+				// console.log('seriously-target.sourceChanged', this.source);
+				if(this.node) this.node.source = this.source.node;
+			},
+
+			//TODO: listen for changes to this.source.node, reassign this.node.source
+			//TODO: do the same in seriously-effect
+
+			widthChanged: function(){
+				this._updateSize();
+			},
+			heightChanged: function(){
+				this._updateSize();
+			},
+			_updateSize: function(){
+				if(!this.node) return;
+				this.node.width = this.width;
+				this.node.height = this.height;
+			},
+
+		});
+
+	</script>
+
+</polymer-element>

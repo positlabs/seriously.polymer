@@ -6,6 +6,9 @@
 	<script>
 
 		(function(){
+		// var elements = document.createElement('div');
+		// elements.className = "seriously-effects"
+		// document.body.appendChild(elements);
 
 		var seriously = new Seriously();
 		var registeredElementTypes = [];
@@ -14,12 +17,10 @@
 
 			publish: {
 				type: '',
-				// list ALLLL possible input types because otherwise polymer won't correctly serialize the values
-				"source":{},"clear":false,"opacity":1,"blendMode":"normal","background":[0,0,0,1],"amount":1,"top":{},"bottom":{},"sizeMode":"bottom","mode":"normal","brightness":1,"contrast":1,"redSource":{},"greenSource":{},"blueSource":{},"alphaSource":{},"red":0,"green":1,"blue":2,"alpha":3,"anchor":[0,0],"size":[4,4],"color1":[1,1,1,1],"color2":[0.7333333333333333,0.7333333333333333,0.7333333333333333,1],"width":640,"height":360,"screen":[0.25882352941176473,0.7647058823529411,0.12156862745098039,1],"weight":1,"balance":1,"clipBlack":0,"clipWhite":1,"mask":false,"hueMin":0,"hueMax":360,"hueMinFalloff":0,"hueMaxFalloff":0,"saturationMin":0,"saturationMax":1,"saturationMinFalloff":0,"saturationMaxFalloff":0,"lightnessMin":0,"lightnessMax":1,"lightnessMinFalloff":0,"lightnessMaxFalloff":0,"color":[0,0,0,1],"concentration":2,"correlation":0.5,"guideColor":[1,0.5,0,1],"cube":{},"left":0,"right":0,"type":"0.2","angle":0,"map":{},"fillMode":"color","offset":0.5,"mapScale":[1,1],"exposure":1,"a":0,"b":0,"c":0,"d":0,"rgb":"","black":[0,0,0.5,1],"white":[1,0,0,1],"time":0,"colored":false,"frozen":false,"gradient":{},"transition":0,"invert":false,"smoothness":0,"center":[0,0],"highlights":1,"shadows":0,"hue":0.4,"saturation":0,"segments":6,"source0":{},"opacity0":1,"source1":{},"opacity1":1,"source2":{},"opacity2":1,"source3":{},"opacity3":1,"slope":[1,1,1,1],"intercept":[0,0,0,0],"timer":0,"luminanceThreshold":0.1,"amplification":1.4,"overlay":true,"yaw":0,"fov":80,"pitch":0,"pixelSize":[8,8],"wave":4.1887902047863905,"distortion":1,"lines":60,"intensity":0.1,"active":0,"noiseScale":[1,1],"noiseOffset":[0,0],"octaves":1,"persistence":0.5,"sourceA":{},"sourceB":{},"split":0.5,"fuzzy":0,"frameRate":15,"light":[1,0.9,0.5,1],"dark":[0.2,0.05,0,1],"toned":1,"desat":0.5,"verticalSync":0.1,"lineSync":0.2,"scanlines":0.3,"bars":0,"frameShape":0.27,"frameLimit":0.34,"frameSharpness":8.4,"frameColor":[0,0,0,1],"auto":true,
 			},
 
 			created: function(){
-				// console.log('element-generator.created', this.getAttribute('type'), this.attributes.array());
+				console.log('element-generator.created', this.getAttribute('type'));
 				this.name = 'seriously-effect-'+this.getAttribute('type');
 			},
 			
@@ -29,35 +30,38 @@
 					registeredElementTypes.push(this.name);
 
 					// template
-					var tmplString = '<polymer-element name="'+this.name+'"><template></template></polymer-element>';
-					document.head.innerHTML += tmplString;
+					var tmpDiv = document.createElement('div');
+					var tmplString = '<polymer-element name="'+this.name+'"></polymer-element>';
+					tmpDiv.innerHTML = tmplString;
+					document.head.appendChild(tmpDiv.children[0]);
+					// elements.appendChild(tmpDiv.children[0]);
 
 					// assemble publishable stuff
-					var publish = {type: this.type};
-					var inputs = seriously.effect(this.type).inputs();
-					Object.keys(inputs).map(function(inputName){
-						if(inputs[inputName].type == 'image'){
-							publish[inputName] = {};
-						}else{
-							publish[inputName] = inputs[inputName].defaultValue;
-						}
-					});
-
-					console.log('registering', this.name, publish);
-
-					Polymer(this.name, {
-						publish: publish,
-
+					var proto = {
+						publish: {type: this.type},
 						ready: function(){
-							console.log('ready!', publish);
+							console.log('ready!');
+							this.node = seriously.effect(this.type);
 						},
-
-						attributeChanged: function(oldVal, newVal){
-							
-						},
+					};
+					var inputs = seriously.effect(this.type).inputs();
+					Object.keys(inputs).forEach(function(inputName){
+						// if(inputs[inputName].type == 'image'){
+						// 	proto.publish[inputName] = {};
+						// }else{
+						proto.publish[inputName] = inputs[inputName].defaultValue; //assign defaults
+						// }
+						proto[inputName+'Changed'] = function(oldVal, newVal){
+							this.node[inputName] = newVal;
+						};
 					});
 
-					//TODO: make nameChanged handlers because serialization
+					// flexible source assignment
+					proto.sourceChanged = function(){
+						//TODO
+					};
+					
+					Polymer(this.name, proto);
 
 					return false;
 				}
@@ -68,7 +72,6 @@
 				// console.log('element-generator.domReady', this.name);
 
 				var initialized = this._elementDeclaration();
-				// if(!initialized) return;
 			
 				var effectInstance = document.createElement(this.name);
 				this.attributes.array().map(function(attr){

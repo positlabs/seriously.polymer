@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../../bower_components/webcomponentsjs/webcomponents.js"></script>
+		<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+		<script src="../../bower_components/Seriously.js/seriously.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.blur.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.pixelate.js"></script>
+
+		<link rel="import" href="seriously-effect.html">
+		<link rel="import" href="seriously-graph.html">
+		<link rel="import" href="seriously-target.html">
+		<link rel="import" href="seriously-source.html">
+	</head>
+	<body unresolved>
+		<template is="auto-binding" id="dynoEl">
+			
+			<div>
+				<label>Px Size: <input type="range" value="{{pxSize}}" min="1" max="100"></label>
+			</div>
+
+			<seriously-graph linear>
+				<seriously-source>
+					<img src="../../demos/images/robot.jpg">
+				</seriously-source>
+				<seriously-effect type="pixelate" pixelSize="{{[pxSize, pxSize]}}" ></seriously-effect>
+				<seriously-effect type="blur" amount="{{pxSize / 100}}"></seriously-effect>
+				<seriously-effect type="pixelate" pixelSize="{{[pxSize/4, pxSize/4]}}" ></seriously-effect>
+				<seriously-target width="400" height="400"></seriously-target>
+			</seriously-graph>
+
+		</template>
+		<script>
+			window.addEventListener('polymer-ready', function() {
+				var dynoEl = document.getElementById('dynoEl');
+				dynoEl.pxSize = 10;
+			});
+		</script>
+	</body>
+</html>
