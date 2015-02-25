@@ -13,8 +13,13 @@
 			publish: {
 				width: 300,
 				height: 150,
-				source: {},
+				source: null,
 				type: 'target', // doesn't do anything...
+			},
+
+			domReady: function(){
+				this._seriously = this.parentNode.seriously;
+				this.node = this._seriously.target(this.$.canvas);
 			},
 
 			sourceChanged: function(){
@@ -28,17 +33,13 @@
 			widthChanged: function(){
 				this._updateSize();
 			},
-
 			heightChanged: function(){
 				this._updateSize();
 			},
-
 			_updateSize: function(){
-				//TODO: update renderer size
-			},
-
-			_seriouslyChanged: function(){
-				this.node = this._seriously.target(this.$.canvas);
+				if(!this.node) return;
+				this.node.width = this.width;
+				this.node.height = this.height;
 			},
 
 		});
