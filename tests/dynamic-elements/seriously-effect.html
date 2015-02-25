@@ -30,12 +30,7 @@
 
 					// template
 					var tmplString = '<polymer-element name="'+this.name+'"><template></template></polymer-element>';
-					// document.body.innerHTML += tmplString;
 					document.head.innerHTML += tmplString;
-					// setTimeout(function(){
-					// 	console.log(document.head.querySelector('polymer-element[name="'+this.name+'"]'));
-					// 	document.head.querySelector('polymer-element[name="'+this.name+'"]').remove();
-					// }.bind(this), 1);
 
 					// assemble publishable stuff
 					var publish = {type: this.type};
@@ -52,8 +47,13 @@
 
 					Polymer(this.name, {
 						publish: publish,
+
 						ready: function(){
 							console.log('ready!', publish);
+						},
+
+						attributeChanged: function(oldVal, newVal){
+							
 						},
 					});
 

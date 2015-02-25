@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<polymer-element name="seriously-effect">
+	<script>
+		(function () {
+		
+			// collect all the seriously-effect-<<type>> <polymer-elements> into here
+			var elements = document.body.appendChild(document.createElement('seriously-effect-types'));
+			var types = {};
+			var seriously = new Seriously();
+
+			Polymer({
+			
+				created: function () {
+					if (this.hasAttribute('type')) this.init();
+				},
+		
+				// imperative createElement('seriously-effect') would then require call to init() to complete
+				init: function () {
+					var name = this._ensureElement();
+					if (!name) return;
+		
+					// get mustache bindings before they get parsed and bound
+					var instanceDecl = '<' + name + ' ';
+					var attrs = this.attributes;
+					for(var i = 0, l = attrs.length, attr; attr = attrs[i], i < l; ++i){
+						instanceDecl += attr.name + '="' + attr.value + '" ';
+					}
+					instanceDecl += '></' + name + '>';
+		
+					// and save
+					this._effectInstanceDecl = instanceDecl;
+				},
+		
+				ready: function() {
+					// <seriously-effect>s should always be created from template stamping
+					var parentNode = this.parentNode;
+					var templateCreator;
+					while(parentNode)
+						if(parentNode.templateCreator_) {
+							templateCreator = parentNode.templateCreator_;
+							break;
+						}else {
+							parentNode = parentNode.parentNode;
+						}
+		
+					if(templateCreator) this._effectInstance = templateCreator.injectBoundHTML(this._effectInstanceDecl);
+				},
+		
+				domReady: function() {
+					this.parentNode.insertBefore(this._effectInstance, this);
+					this.parentNode.removeChild(this);
+				},
+		
+				_ensureElement: function () {
+					if (!this.hasAttribute('type')) {
+						console.warn('<seriously-effect> has to \'type\' attribute.');
+						return null;
+					}
+		
+					var type = this.getAttribute('type');
+					var name = 'seriously-effect-' + type;
+					if (types[type]) return name;
+					types[type] = true;
+		
+					// create a temp instance of effect, only to get list of its possible inputs
+					var inputs = seriously.effect(type).inputs();
+
+					// make a polymer-element decl for new effect element
+					var makeElement = document.createElement('div');
+					makeElement.innerHTML = '<polymer-element name="' + name + '"></polymer-element>';
+					elements.appendChild(makeElement.children[0]);
+
+					var proto = {
+						publish: {type: type},
+						created: function() {
+							console.log('created!', type);
+							this.node = seriously.effect(type);
+						},
+						sourceChanged: function(){
+							this.node.source = this.source.node;
+						},
+					};
+
+					Object.keys(inputs).forEach(function(inputName){
+
+						// add publishable stuff
+						if(inputs[inputName].type == 'image'){
+							proto.publish[inputName] = {}; // image default is undefined, but we want to hint object
+						}else{
+							proto.publish[inputName] = inputs[inputName].defaultValue;
+						}
+
+						// change handlers
+						if(inputName == 'source') return;
+						proto[inputName+'Changed'] = function(oldVal, newVal){
+							console.log(inputName+'Changed', this[inputName]);
+							this.node[name] = newVal;
+						};
+
+					}); 
+		
+					Polymer(name, proto);
+					return name;
+				}
+			});
+		})();
+	</script>
+</polymer-element>
