@@ -23,7 +23,6 @@
 					var instanceDecl = '<' + name + ' ';
 					var attrs = this.attributes;
 					for(var i = 0, l = attrs.length, attr; attr = attrs[i], i < l; ++i){
-						// if(attr.name !== 'type') instanceDecl += attr.name + '="' + attr.value + '" ';
 						instanceDecl += attr.name + '="' + attr.value + '" ';
 					}
 					instanceDecl += '></' + name + '>';
@@ -48,9 +47,8 @@
 				},
 		
 				domReady: function() {
-					// abracadabra, presto chango!
 					this.parentNode.insertBefore(this._effectInstance, this);
-					// this.parentNode.removeChild(this);
+					this.parentNode.removeChild(this);
 				},
 		
 				_ensureElement: function () {
@@ -66,47 +64,42 @@
 		
 					// create a temp instance of effect, only to get list of its possible inputs
 					var inputs = seriously.effect(type).inputs();
-		
-					// console.log(Object.keys(inputs).join(' '));
+
 					// make a polymer-element decl for new effect element
-					var declaration =
-						'<polymer-element ' +
-							'name="' + name + '" ' +
-							// 'attributes="' + Object.keys(inputs).join(' ') + '" ' +
-							// 'attributes="' + inputs.join(' ') + '" ' +
-						'></polymer-element>';
 					var makeElement = document.createElement('div');
-					makeElement.innerHTML = declaration;
+					makeElement.innerHTML = '<polymer-element name="' + name + '"></polymer-element>';
 					elements.appendChild(makeElement.children[0]);
 
-					// assemble publishable stuff
-					var publish = {type: type};
-					Object.keys(inputs).forEach(function(inputName){
-						if(inputs[inputName].type == 'image'){
-							publish[inputName] = {}; // image default is undefined, but we want to hint object
-						}else{
-							publish[inputName] = inputs[inputName].defaultValue;
-						}
-					}); // console.log(publish);
-
 					var proto = {
-						publish: publish,
+						publish: {type: type},
 						created: function() {
 							console.log('created!', type);
 							this.node = seriously.effect(type);
 						},
+						sourceChanged: function(){
+							this.node.source = this.source.node;
+						},
 					};
 
-					// change handlers
 					Object.keys(inputs).forEach(function(inputName){
+
+						// add publishable stuff
+						if(inputs[inputName].type == 'image'){
+							proto.publish[inputName] = {}; // image default is undefined, but we want to hint object
+						}else{
+							proto.publish[inputName] = inputs[inputName].defaultValue;
+						}
+
+						// change handlers
+						if(inputName == 'source') return;
 						proto[inputName+'Changed'] = function(oldVal, newVal){
 							console.log(inputName+'Changed', this[inputName]);
 							this.node[name] = newVal;
 						};
-					});
+
+					}); 
 		
 					Polymer(name, proto);
-		
 					return name;
 				}
 			});
