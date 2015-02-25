@@ -1,0 +1,23 @@
+{
+  "name": "seriously.polymer",
+  "version": "0.0.11",
+  "homepage": "https://github.com/positlabs/seriously.polymer",
+  "authors": [
+    "Josh Beckwith <josh.beckwith@gmail.com>"
+  ],
+  "description": "Polymer components for Seriously.js",
+  "main": "seriously-components.html",
+  "keywords": [
+    "webgl",
+    "web-components"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.4",
+    "Seriously.js": "git@github.com:brianchirls/Seriously.js.git"
+  }
+}

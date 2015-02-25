@@ -1,0 +1,147 @@
+
+<!-- 
+
+	// Default usage connects nodes with sourceID pointers
+	//
+	<seriously-graph>
+		<seriously-source id="source" >
+			<img src="images/pencils.jpg" >
+		</seriously-source>
+		<seriously-effect id="pxl8" source="{{$.source}}" type="pixelate" ></seriously-effect>
+		<seriously-target id="target" source="{{$.pxl8}}" ></seriously-target>
+	</seriously-graph>
+
+
+	// Linear graph chains nodes together in the order they appear.
+	// Super cool because it updates node graph when dom elements are re-ordered.
+	// e.g. dragging dom nodes in dev tools!
+	//
+	<seriously-graph linear>
+		<seriously-source >
+			<img src="images/pencils.jpg" >
+		</seriously-source>
+		<seriously-effect type="pixelate" ></seriously-effect>
+		<seriously-target ></seriously-target>
+	</seriously-graph>
+
+ -->
+
+<polymer-element name="seriously-graph">
+
+	<template>
+		<content></content>
+	</template>
+
+	<script>
+
+		Polymer('seriously-graph', {
+
+			// lifecycle and definition
+			//
+
+			publish: {
+				linear: false, 			// daisy chain nodes. default is to assign source
+				onframe: function(){},	// reqanimframe callback
+			},
+
+			created: function(){
+				this._onNodeDisabledChanged = this._onNodeDisabledChanged.bind(this);
+				this._onFrame = this._onFrame.bind(this);
+			},
+
+			domReady: function(){
+				// console.dir(this)
+
+				var srsly = this.seriously = new Seriously();
+
+				var nodes = this._getNodes();
+				nodes.forEach(function(node){
+					node._seriously = srsly;
+				});
+
+				// waiting for change listeners to fire after setting seriously instance on nodes
+				setTimeout(function(){ 
+					this._connectNodes();
+					this.onMutation(this, this._mutated);
+					this.seriously.go(this._onFrame);
+				}.bind(this), 1);
+			},
+
+
+			// public
+			//
+
+			export: function(){
+				
+				//TODO: return a pretty string of vanilla js that is equivalent to the current graph.
+
+			},
+
+
+			// private
+			//
+
+			_onFrame: function(time){
+				// console.log(this.onframe);
+				this.onframe(time);
+			},
+
+			_getNodes: function(){
+				// console.log('_getNodes', Array.prototype.slice.call(this.children))
+				return Array.prototype.slice.call(this.children);
+			},
+
+			_getActiveNodes: function(fromNodes){
+				fromNodes = fromNodes || this._getNodes();
+				return fromNodes.filter(function(node){
+					if(!node.off) return node;
+				});
+			},
+
+			_connectNodes: function(){
+				// console.log('\nseriously-graph._connectNodes');
+
+				this.job('connectNodes', function(){ // debounce
+
+					// listen for node events
+					var allNodes = this._getNodes();
+					for (var i = 1; i < allNodes.length; i++) {
+						allNodes[i].removeEventListener('off-changed', this._onNodeDisabledChanged);
+						allNodes[i].addEventListener('off-changed', this._onNodeDisabledChanged);
+					}
+	
+					if(this.linear){ // daisy chain
+
+						// connect active nodes
+						var activeNodes = this._getActiveNodes(allNodes);
+						for (var i = 1; i < activeNodes.length; i++) {
+							// console.log('\tconnecting', activeNodes[i-1].type, 'to', activeNodes[i].type);
+
+							(function(i){
+								setTimeout(function(){ // prevents cyclical ref error from Seriously, but seems hacky
+									activeNodes[i].source = activeNodes[i-1];
+								}, 1);
+							})(i);
+						}
+					}
+				}.bind(this), 10);
+
+			},
+
+			_onNodeDisabledChanged: function(){
+				// console.log('seriously-graph._onNodeDisabledChanged');
+				this._connectNodes();
+			},
+
+			_mutated: function(){
+				// console.log('seriously-graph._mutated', arguments);
+				// NOTE: not sure if this is the most efficient way to do this. When is onMutation callback triggered?
+				this._connectNodes(); // reconnect nodes when node order changes
+				this.onMutation(this, this._mutated);
+			},
+
+
+		});
+	</script>
+
+</polymer-element>

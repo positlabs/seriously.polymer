@@ -1,0 +1,121 @@
+
+<link rel="import" href="./seriously-node.html">
+
+<polymer-element name="seriously-effect" extends="seriously-node">
+
+	<!-- <template></template> -->
+
+	<script>
+
+		/**
+			
+			wrapper for seriously.effect nodes
+
+		*/
+
+		Polymer('seriously-effect', {
+
+			publish: {
+				type: '',			// type of effect. used to generate effect instance
+				source: {}, 		// input component.
+			},
+
+			ready: function(){
+				this._attrMutationHandler = this._attrMutationHandler.bind(this);
+			},
+
+			sourceChanged: function(){
+				// console.log('seriously-effect.sourceChanged', this.source.node);
+				if(this.node) this.node.source = this.source.node;
+			},
+
+			_seriouslyChanged: function(){
+				// console.log('seriously-effect.seriouslyChanged', this.source.node);
+				this.node = this._seriously.effect(this.type); // invalidate node
+				if(this.source && this.source.node) this.node.source = this.source.node;
+
+				this._publishAttributes(this.node.inputs());
+			},
+
+			// set up dynamic attributes from node.inputs()
+			_publishAttributes: function(attrs){
+
+				var keys = Object.keys(attrs),
+					watchKeys = [];
+
+				for (var i = keys.length - 1; i >= 0; i--) {
+
+					(function(_this, key){
+
+						if(key !== 'source'){ // blacklist. source is a published attribute
+
+							var lcKey = key.toLowerCase()
+							watchKeys.push(lcKey); // attribute names are always lowercase
+
+							// define prop accessors
+							Object.defineProperty(_this, lcKey, {
+								get: function() {
+									// console.log('getting', key, this[key+'_']);
+									return _this[key+'_'];
+								},
+								set: function(value) {
+									// console.log('setting', key, 'to', value);
+									// _this[key+'_'] = value;
+									_this.node[key] = value;
+								},
+							});
+
+							var attr = _this.getAttribute(key);
+							if(attr == null){
+								attr = attrs[key];
+							}else{
+								attr = _this._deserialize(attr);
+							}
+							_this[key] = attr;
+							_this.node[key] = attr;
+
+						}
+
+					})(this, keys[i]);
+
+				}
+
+				// listen for attribute changes
+				if(this.attrObserver) this.attrObserver.close();
+				this.attrObserver = new MutationObserver(this._attrMutationHandler.bind(this));
+				this.attrObserver.observe(this, {
+					attributes: true,
+					attributeFilter: watchKeys,
+				});
+
+			},
+
+			_attrMutationHandler: function(mutations){
+
+				for (var i = mutations.length - 1; i >= 0; i--) {
+					var m = mutations[i];
+					var value = this.getAttribute(m.attributeName);
+					this[m.attributeName] = this._deserialize(value, this[m.attributeName]);
+					// console.log('_attrMutationHandler', m.attributeName, this.getAttribute(m.attributeName), this[m.attributeName]);
+				}
+			},
+
+			// convert string to array, number, or boolean
+			_deserialize: function(value, currentValue){
+				// console.log('_deserialize', value);
+
+				//TODO: cache or infer type
+				if(typeof currentValue == 'string') return value;
+				else if(value === 'true') return true;
+				else if(value === 'false') return false;
+				else if(!isNaN(Number(value))) return Number(value);
+				// else if(currentValue instanceof Array) return value.split(','); // array
+				else if(value.split(',').length > 0) return value.split(','); // array
+				else return value;
+			},
+
+		});
+
+	</script>
+
+</polymer-element>

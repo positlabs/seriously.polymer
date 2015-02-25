@@ -1,0 +1,63 @@
+<html>
+		
+	<head>
+		<script src="../../bower_components/webcomponentsjs/webcomponents.js"></script>
+		
+		<script src="../../bower_components/Seriously.js/seriously.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.pixelate.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.blur.js"></script>
+		
+		<link rel="import" href="../../bower_components/polymer/polymer.html">
+		<link rel="import" href="../../seriously-components.html">
+	</head>
+
+	<body>
+
+		<polymer-element name="source-id">
+
+			<template>
+				
+				<seriously-graph>
+					
+					<seriously-source id="source1">
+						<img src="../../demos/images/robot.jpg">
+					</seriously-source>
+
+					<seriously-source id="source2">
+						<img src="../../demos/images/pencils.jpg">
+					</seriously-source>
+
+					<seriously-effect type="blur" id="blurNode" source="{{$.source1}}" amount=".5"></seriously-effect>
+					<!-- <seriously-effect type="pixelate" id="pixelate" source="{{$.blurNode}}" ></seriously-effect> -->
+					<seriously-target id="target" source="{{$.blurNode}}" width="411" height="425"></seriously-target>
+
+				</seriously-graph>
+
+			</template>
+
+			<script>
+
+				Polymer('source-id', {
+					
+					ready: function(){
+
+						setTimeout(function(){
+							this.$.target.source = this.$.source2;
+						}.bind(this), 1000);
+
+						setTimeout(function(){
+							this.$.target.source = this.$.source1;
+						}.bind(this), 3000);
+
+					},
+
+				});
+
+			</script>
+
+		</polymer-element>
+		<source-id></source-id>
+
+	</body>
+
+</html>
