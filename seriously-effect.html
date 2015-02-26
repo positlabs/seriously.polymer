@@ -6,7 +6,6 @@
 		
 			// collect all the seriously-effect-<<type>> <polymer-elements> into here
 
-			var elements = undefined;
 			var types = {};
 
 			Polymer({
@@ -22,8 +21,6 @@
 		
 				// imperative createElement('seriously-effect') would then require call to init() to complete
 				init: function () {
-					// var name = this._ensureElement();
-					// if (!name) return;
 					var name = 'seriously-effect-' + this.type;
 		
 					// get mustache bindings before they get parsed and bound
@@ -39,8 +36,7 @@
 		
 				domReady: function(){
 					this._seriously = this.parentNode.seriously; // grab ref from seriously-graph
-					this.node = this._seriously.effect(this.type);
-					var name = this._ensureElement();
+					this._ensureElement();
 
 					// <seriously-effect>s should always be created from template stamping
 					var parentNode = this.parentNode;
@@ -56,16 +52,20 @@
 					if(!modelElement) return;
 
 					// abracadabra presto chango!
-					this.parentNode.insertBefore(modelElement.injectBoundHTML(this._effectInstanceDecl), this);
+					var tempDiv = document.createElement('div')
+					tempDiv.appendChild(modelElement.injectBoundHTML(this._effectInstanceDecl));
+					tempDiv.children[0]._seriously = this._seriously;
+					this.parentNode.insertBefore(tempDiv.children[0], this);
+
 					this.parentNode.removeChild(this);
 					this._effectInstanceDecl = null;
 				},
 		
 				_ensureElement: function () {
-					if (!this.hasAttribute('type')) {
-						console.warn('<seriously-effect> has to \'type\' attribute.');
-						return null;
-					}
+					// if (!this.hasAttribute('type')) {
+					// 	console.warn('<seriously-effect> has to \'type\' attribute.');
+					// 	return null;
+					// }
 		
 					var type = this.getAttribute('type');
 					var name = 'seriously-effect-' + type;
@@ -73,46 +73,32 @@
 					types[type] = true;
 		
 					// create a temp instance of effect, only to get list of its possible inputs
-					var inputs = this.node.inputs();
+					var inputs = this._seriously.effect(this.type).inputs();
 
 					// make a polymer-element decl for new effect element
 					var makeElement = document.createElement('div');
 					makeElement.innerHTML = '<polymer-element name="' + name + '" extends="seriously-node"></polymer-element>';
-					if(elements == undefined){
-						var elements = document.createElement('div');
-						elements.className = "seriously-effects"
-						document.body.appendChild(elements);
-					}
-					elements.appendChild(makeElement.children[0]);
+					document.head.appendChild(makeElement.children[0]);
 
-					var parentNode = this.parentNode;
 					var proto = {
 						publish: {
 							type: type,
-							// source: null,
 						},
-						ready: function() {
-							this._seriously = parentNode.seriously;
+						domReady: function() {
+							// console.log('ready', this._seriously);
 							this.node = this._seriously.effect(type);
-						},
-						domReady: function(){
-							console.log('domReady!', type);
 						},
 					};
 
 					Object.keys(inputs).forEach(function(inputName){
 
 						// add publishable stuff
-						if(inputs[inputName].type == 'image'){
-							proto.publish[inputName] = {}; // image default is undefined, but we want to hint object
-						}else{
-							proto.publish[inputName] = inputs[inputName].defaultValue;
-						}
+						proto.publish[inputName] = inputs[inputName].defaultValue; // TODO: watch out for arrays and objects
 
 						// change handlers
 						proto[inputName+'Changed'] = function(oldVal, newVal){
 							// console.log(inputName+'Changed', this[inputName], this.node);
-							this.node[inputName] = newVal;
+							if(this.node) this.node[inputName] = newVal;
 						};
 
 					}); 
@@ -129,7 +115,6 @@
 					};
 		
 					Polymer(name, proto);
-					return name;
 				}
 			});
 		})();
