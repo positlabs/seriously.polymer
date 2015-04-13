@@ -168,9 +168,6 @@
 						color="{{ [0,0,0,0] }}" >
 					</effect-displacement>
 
-					<!-- <effect-pixelate id="pixelate" source="#displacement" pixelSize="{{[1, 1]}}"></effect-pixelate> -->
-					<!-- <effect-accumulator id="accumulator" source="#pixelate" opacity=".9" ></effect-accumulator> -->
-
 					<effect-accumulator id="accumulator" source="#displacement" opacity=".9" ></effect-accumulator>
 
 					<seriously-target id="target" source="#accumulator" width="1280" height="720"></seriously-target>
@@ -220,14 +217,14 @@
 						var rand = Math.random();
 						if(rand < .33){
 							this.$.accumulator.blendMode = "multiply";
-							this.$.accumulator.opacity = .03;
+							this.$.accumulator.opacity = .01;
 						
 						}else if(rand < .66){
 							this.$.accumulator.blendMode = "screen";
-							this.$.accumulator.opacity = .05;
+							this.$.accumulator.opacity = .02;
 						}else{
 							this.$.accumulator.blendMode = "normal";
-							this.$.accumulator.opacity = .1;
+							this.$.accumulator.opacity = .01;
 						}
 
 					},
