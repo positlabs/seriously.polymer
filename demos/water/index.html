@@ -165,10 +165,10 @@
 						fillMode="color"
 						amount="{{displacementAmount}}"
 						mapScale="{{ [.01, .01] }}"
-						color="{{ [0,0,0,0] }}" >
+						color="{{ [0,0,0, .05] }}" >
 					</effect-displacement>
 
-					<effect-accumulator id="accumulator" source="#displacement" opacity=".9" ></effect-accumulator>
+					<effect-accumulator id="accumulator" source="#displacement" opacity=".05" ></effect-accumulator>
 
 					<seriously-target id="target" source="#accumulator" width="1280" height="720"></seriously-target>
 				
@@ -224,7 +224,7 @@
 							this.$.accumulator.opacity = .02;
 						}else{
 							this.$.accumulator.blendMode = "normal";
-							this.$.accumulator.opacity = .01;
+							this.$.accumulator.opacity = .05;
 						}
 
 					},
