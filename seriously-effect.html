@@ -1,3 +1,5 @@
+<!--  probably won't use this approch because it is overly complicated and hard to debug -->
+
 <!-- based on this gist -> https://gist.github.com/phestermcs/bd631c5822d192dbbb3d -->
 
 <polymer-element name="seriously-effect">
@@ -22,12 +24,13 @@
 				// imperative createElement('seriously-effect') would then require call to init() to complete
 				init: function () {
 					var name = 'seriously-effect-' + this.type;
-		
+
 					// get mustache bindings before they get parsed and bound
 					var instanceDecl = '<' + name + ' ';
 					var attrs = this.attributes;
 					for(var i = 0, l = attrs.length, attr; attr = attrs[i], i < l; ++i){
-						instanceDecl += attr.name + '="' + attr.value + '" ';
+						if(attr.name != 'id')
+							instanceDecl += attr.name + '="' + attr.value + '" ';
 					}
 					instanceDecl += '></' + name + '>';
 		
@@ -55,8 +58,8 @@
 					var tempDiv = document.createElement('div')
 					tempDiv.appendChild(modelElement.injectBoundHTML(this._effectInstanceDecl));
 					tempDiv.children[0]._seriously = this._seriously;
-					this.parentNode.insertBefore(tempDiv.children[0], this);
-
+					var effectInsance = tempDiv.children[0];
+					this.parentNode.insertBefore(effectInsance, this);
 					this.parentNode.removeChild(this);
 					this._effectInstanceDecl = null;
 				},
@@ -106,6 +109,12 @@
 					proto.sourceChanged = function(oldVal, newVal){
 						// console.log('\nsourceChanged', this.type, oldVal, newVal);
 						// console.log(newVal, newVal.node, newVal instanceof HTMLElement);
+						if(this.node == undefined){ // need to wait for initialization
+							setTimeout(function(){
+								this.sourceChanged(oldVal, newVal);
+							}.bind(this), 1);
+							return;
+						} 
 
 						if(newVal instanceof HTMLElement){
 							this.node.source = newVal.node; // source is a component

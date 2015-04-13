@@ -1,0 +1,243 @@
+<html>
+	<head>
+
+		<script src="../../bower_components/webcomponentsjs/webcomponents.js"></script>
+		<link rel="import" href="../../bower_components/polymer/polymer.html">
+		
+		<script src="../../bower_components/Seriously.js/seriously.js"></script>
+		<link rel="import" href="../../seriously-components.html">
+
+		<script src="../../bower_components/Seriously.js/seriously.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.pixelate.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.accumulator.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.displacement.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.hue-saturation.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.color-select.js"></script>
+		<script src="../../bower_components/Seriously.js/effects/seriously.blur.js"></script>
+
+		<style>
+			body {
+				background: black;
+			}
+		</style>
+
+	</head>
+
+	<body fullbleed unresolved>
+
+
+<!-- 		<polymer-element name="terrain-projection">
+
+			<template>
+
+				<style>
+
+					#seriously-target {
+						width: 100%;
+						height: 100%;
+					}
+
+				</style>
+
+				<canvas id="seriously-target" width="1280" height="720"></canvas>
+				<video id="seriously-source" src="../videos/00244=65142=64621=63600.mp4" autoplay loop hidden muted></video>
+				<video id="displacement-map" src="../videos/water.webm" autoplay hidden loop muted></video>
+
+			</template>
+			
+			<script>
+
+			Polymer('terrain-projection', {
+				
+				domReady: function(){
+					this.time = 0;
+
+					this.$['displacement-map'].playbackRate = .5;
+
+					this.seriously = new Seriously();
+					this.target = this.seriously.target(this.$['seriously-target']);
+					this.video = this.seriously.source(this.$['seriously-source']);
+
+					this.colSelect = this.seriously.effect('color-select');
+					this.colSelect.lightnessMin = .5;
+					this.colSelect.hueMin = 150;
+					console.log(this.colSelect.inputs());
+
+					// pixelate for the hairline color outline
+					this.pixelate = this.seriously.effect('pixelate');
+					this.pixelate.pixelSize = [1, 1];
+
+					this.accumulator = this.seriously.effect('accumulator');
+					this.accumulator.blendMode = "normal";
+					this.accumulator.opacity = .1;
+
+					this.huesat = this.seriously.effect('hue-saturation');
+					this.huesat.saturation = -.3;
+
+					this.displacement = this.seriously.effect('displacement');
+					this.displacement.map = this.seriously.source(this.$['displacement-map']);
+					this.displacement.fillMode = 'color'; // wrap, color, ignore, clamp
+					this.displacement.mapScale = [.01,.01];
+					this.displacement.color = [0,0,0, 0];
+
+					// source chaining
+					this.colSelect.source = this.video;
+					this.displacement.source = this.colSelect;
+					this.pixelate.source = this.displacement;
+					this.accumulator.source = this.pixelate;
+					// this.accumulator.source = this.displacement;
+					this.huesat.source = this.accumulator
+					this.target.source = this.huesat;
+
+					this.seriously.go();
+
+					this.onFrame = this.onFrame.bind(this);
+					this.onFrame();
+
+					this.randomize = this.randomize.bind(this);
+					setInterval(this.randomize, 5000);
+					// this.randomize();
+				},
+
+				randomize: function(){
+
+					if(Math.random() > .5){
+						this.accumulator.blendMode = "screen";
+						// this.accumulator.opacity = .05;
+					}else{
+						this.accumulator.blendMode = "normal";
+						// this.accumulator.opacity = .05;
+					}
+
+				},
+
+				onFrame: function(){
+					this.time ++;
+					this.displacement.offset = .1;
+					this.displacement.amount = Math.sin(this.time*.008) * 1500 + 200;
+					this.huesat.hue = Math.sin(this.time*.002);
+					this.accumulator.opacity = Math.abs(Math.sin(this.time*.005)) * .3;
+					requestAnimationFrame(this.onFrame);
+				},
+
+				onClickFullscreen: function(e){
+					document.body.webkitRequestFullscreen();
+				}
+
+			});
+
+			</script>
+
+		</polymer-element> -->
+
+
+		<!-- <terrain-projection></terrain-projection> -->
+
+
+ 		<polymer-element name="water-demo">
+			<template>
+
+				<style>
+					#saveBtn { 
+						width: 100%;
+						height: 100%;
+						position: fixed;
+						top: 0;left: 0;
+					}
+				</style>
+
+				<seriously-graph id="graph">
+
+   					<seriously-source id="electric-sheep">
+						<video id="sheep-vid" src="../videos/00244=65142=64621=63600.mp4" autoplay loop muted></video>
+					</seriously-source>
+				
+					<seriously-source id="water">
+						<video id="water-vid" src="../videos/water.mp4" autoplay loop muted></video>
+					</seriously-source>
+
+					<effect-color-select id="color-select" source="#electric-sheep" lightnessMin="0.5" saturationMin=".4"></effect-color-select>
+					<effect-hue-saturation id="hs" source="#color-select" hue="{{hue}}" saturation="-.5"></effect-hue-saturation>
+  					
+  					<effect-displacement id="displacement" 
+						source="#hs"
+						map="#water"
+						fillMode="color"
+						amount="{{displacementAmount}}"
+						mapScale="{{ [.01, .01] }}"
+						color="{{ [0,0,0,0] }}" >
+					</effect-displacement>
+
+					<!-- <effect-pixelate id="pixelate" source="#displacement" pixelSize="{{[1, 1]}}"></effect-pixelate> -->
+					<!-- <effect-accumulator id="accumulator" source="#pixelate" opacity=".9" ></effect-accumulator> -->
+
+					<effect-accumulator id="accumulator" source="#displacement" opacity=".9" ></effect-accumulator>
+
+					<seriously-target id="target" source="#accumulator" width="1280" height="720"></seriously-target>
+				
+				</seriously-graph>
+				
+				<!-- <a id="saveBtn" download></a> -->
+
+			</template>
+			<script>
+
+				Polymer('water-demo', {
+
+					domReady: function(){
+						this.hue = 0;
+						this.time = 0;
+						this.displacementAmount = 0;
+
+						this.$['water-vid'].playbackRate = .5;
+						this.$['sheep-vid'].playbackRate = .3;
+
+						this.onFrame = this.onFrame.bind(this);
+						this.onFrame();
+
+						this.randomize = this.randomize.bind(this);
+						setInterval(this.randomize, 5000);
+
+
+						// FIXME: save crashes the thing!
+						// click to save
+						// var _this = this;
+						// this.$.saveBtn.addEventListener('click', function(){
+						//		var dt = _this.$.target.$.canvas.toDataURL();
+						//		this.download = Date.now()+".jpg";
+						// 		this.href = dt;
+						// });
+					},
+
+					onFrame: function(){
+						this.time ++;
+						this.displacementAmount = Math.sin(this.time*.004) * 100;
+						this.hue = Math.sin(this.time*.001);
+						requestAnimationFrame(this.onFrame);
+					},
+	
+					randomize: function(){
+						var rand = Math.random();
+						if(rand < .33){
+							this.$.accumulator.blendMode = "multiply";
+							this.$.accumulator.opacity = .03;
+						
+						}else if(rand < .66){
+							this.$.accumulator.blendMode = "screen";
+							this.$.accumulator.opacity = .05;
+						}else{
+							this.$.accumulator.blendMode = "normal";
+							this.$.accumulator.opacity = .1;
+						}
+
+					},
+				});
+
+			</script>
+		</polymer-element>
+		
+		<water-demo></water-demo>
+
+	</body>
+	
+</html>

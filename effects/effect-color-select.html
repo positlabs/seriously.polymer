@@ -1,0 +1,24 @@
+<link rel="import" href="./abstract-effect.html">
+<polymer-element name="effect-color-select" extends="abstract-effect">
+	<template></template>
+	<script>
+		__createEffectComponent({
+			publish: {
+				type: 'color-select',
+				"hueMin": 0,
+				"hueMax": 360,
+				"hueMinFalloff": 0,
+				"hueMaxFalloff": 0,
+				"saturationMin": 0,
+				"saturationMax": 1,
+				"saturationMinFalloff": 0,
+				"saturationMaxFalloff": 0,
+				"lightnessMin": 0,
+				"lightnessMax": 1,
+				"lightnessMinFalloff": 0,
+				"lightnessMaxFalloff": 0,
+				"mask": false,
+			},
+		});
+	</script>
+</polymer-element>

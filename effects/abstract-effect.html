@@ -1,0 +1,114 @@
+<polymer-element name="abstract-effect" extends="seriously-node">
+	
+	<template></template>
+	
+	<script>
+
+
+		window.__createEffectComponent = function(proto){
+
+			Object.keys(proto.publish).forEach(function(key){
+				if(proto[key+'Changed'] === undefined){
+					proto[key+'Changed'] = function(){
+						this.getNode()[key] = this[key];
+					};
+				}
+			});
+
+			Polymer('effect-' + proto.publish.type, proto);
+		};
+
+
+		Polymer('abstract-effect', {
+			
+			publish: {
+				source: undefined, // source element, or seriously node
+				type: 'effect', // blur, pixelate, etc
+				// node: undefined, // instance of seriously.effect
+			},
+
+			publishedNameMap: undefined,
+
+			ready: function(){
+
+				// create a map for published attributes so we can infer camelcase name
+				var map = this.publishedNameMap = {};
+				Object.keys(this.publish).forEach(function(key){
+					map[key.toLowerCase()] = key;
+				});
+
+			},
+
+			domReady: function() {
+				// console.log('ready', this._seriously);
+				var node = this.getNode();
+
+				// apply all attributes to effect instance
+				var blacklist = ['id', 'class', 'source', 'type', 'hidden', 'length'];
+				Object.keys(this.attributes).forEach(function(key){
+					var attr = this.getAttribute(key);
+					if(attr == null) return;
+					var camelName = this.publishedNameMap[attr.name];
+					if(blacklist.indexOf(attr.name) == -1 && attr.value != undefined){
+						node[camelName] = this[camelName];
+					}
+				}.bind(this));
+
+
+				/////////////////////////////////////
+				// DEBUG
+				// for creating new effect components
+				var inputs = this.node.inputs();
+				var inputsObj = {};
+				Object.keys(inputs).forEach(function(key){
+					if(key == 'source') return;
+					inputsObj[key] = inputs[key].defaultValue;
+					if(inputs[key].defaultValue == undefined) inputsObj[key] = "undefined";
+				});
+				console.log(JSON.stringify(inputsObj));
+				/////////////////////////////////////
+
+			},
+
+			// attributeChanged: function(attrName, oldVal, newVal){
+			// 	var camelCaseName = this.publishedNameMap[attrName];
+			// 	console.log('attributeChanged', camelCaseName, oldVal, newVal, typeof newVal);
+			// 	console.log(this[camelCaseName])
+				// this.node[camelCaseName] = newVal;
+			// },
+
+			// sourceChanged: function(oldVal, newVal){
+			// 	// console.log('\nsourceChanged', this.type, oldVal, newVal);
+			// 	// console.log(newVal, newVal.node, newVal instanceof HTMLElement);
+
+			// 	if(typeof newVal === 'string'){ // source is a selector string
+					
+			// 		this.getNode().source = this.parentNode.querySelector(newVal).getNode(); 
+
+			// 	}else if(newVal instanceof HTMLElement){ // source is a component
+
+			// 		this.getNode().source = newVal.node; 
+
+			// 	}else{ // source is a Seriously source
+
+			// 		this.getNode().source = newVal; 
+
+			// 	}
+			// },
+
+
+			// public
+			//
+
+			getNode: function(){
+				if(this.node == undefined){
+					this._seriously = this.parentNode.seriously;
+					this.node = this._seriously.effect(this.type);
+				}
+				return this.node;
+			},
+
+		});
+	</script>
+
+</polymer-element>

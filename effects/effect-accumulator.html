@@ -1,0 +1,16 @@
+<link rel="import" href="./abstract-effect.html">
+<polymer-element name="effect-accumulator" extends="abstract-effect">
+	<template></template>
+	<script>
+		__createEffectComponent({
+
+			publish: {
+				type: 'accumulator',
+				clear: false,
+				opacity: 1,
+				blendMode: "normal",
+			},
+
+		});
+	</script>
+</polymer-element>

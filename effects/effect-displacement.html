@@ -1,0 +1,35 @@
+<link rel="import" href="./abstract-effect.html">
+<polymer-element name="effect-displacement" extends="abstract-effect">
+	<template></template>
+	<script>
+		__createEffectComponent({
+			publish: {
+				type: 'displacement',
+				fillMode: "color",
+				color: [0,0,0,0],
+				offset: 0.5,
+				mapScale: [1,1],
+				amount: 1,
+				map: undefined
+			},
+
+			mapChanged: function(oldVal, newVal){
+				// console.log('mapChanged', newVal, this.parentNode.querySelector(newVal))
+
+				if(typeof newVal === 'string'){ // source is a selector string
+					
+					this.getNode().map = this.parentNode.querySelector(newVal).getNode(); 
+
+				}else if(newVal instanceof HTMLElement){ // source is a component
+
+					this.getNode().map = newVal.getNode(); 
+
+				}else{ // source is a Seriously source
+
+					this.getNode().map = newVal; 
+
+				}
+			},
+		});
+	</script>
+</polymer-element>
