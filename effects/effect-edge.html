@@ -1,0 +1,12 @@
+<link rel="import" href="./abstract-effect.html">
+<polymer-element name="effect-edge" extends="abstract-effect">
+	<template></template>
+	<script>
+		__createEffectComponent({
+			publish: {
+				type: 'edge',
+				mode: 'sobel',
+			},
+		});
+	</script>
+</polymer-element>
