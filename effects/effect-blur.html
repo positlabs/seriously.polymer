@@ -1,0 +1,12 @@
+<link rel="import" href="./abstract-effect.html">
+<polymer-element name="effect-blur" extends="abstract-effect">
+	<template></template>
+	<script>
+		__createEffectComponent({
+			publish: {
+				type: 'blur',
+				amount: .2,
+			},
+		});
+	</script>
+</polymer-element>

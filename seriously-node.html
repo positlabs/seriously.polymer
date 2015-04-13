@@ -23,6 +23,25 @@
 				this.fire('off-changed');
 			},
 
+			sourceChanged: function(oldVal, newVal){
+				// console.log('\nsourceChanged', this.type, oldVal, newVal);
+				// console.log(newVal, newVal.node, newVal instanceof HTMLElement);
+
+				if(typeof newVal === 'string'){ // source is a selector string
+					
+					this.getNode().source = this.parentNode.querySelector(newVal).getNode(); 
+
+				}else if(newVal instanceof HTMLElement){ // source is a component
+
+					this.getNode().source = newVal.getNode(); 
+
+				}else{ // source is a Seriously source
+
+					this.getNode().source = newVal; 
+
+				}
+			},
+
 			// linear graph methods
 			//
 			

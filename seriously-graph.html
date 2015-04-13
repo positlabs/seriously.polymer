@@ -45,21 +45,15 @@
 			},
 
 			created: function(){
+				console.log('seriously-graph.created');
 				this._onNodeDisabledChanged = this._onNodeDisabledChanged.bind(this);
 				this._onFrame = this._onFrame.bind(this);
 
 				this.seriously = new Seriously();
 			},
 
-			domReady: function(){
+			attached: function(){
 				// console.dir(this)
-
-				// var srsly = this.seriously = new Seriously();
-
-				// var nodes = this._getNodes();
-				// nodes.forEach(function(node){
-				// 	node._seriously = this.seriously;
-				// });
 
 				// waiting for change listeners to fire after setting seriously instance on nodes
 				setTimeout(function(){ 
@@ -92,10 +86,6 @@
 				// console.log('_getNodes', Array.prototype.slice.call(this.children))
 				var nodes = Array.prototype.slice.call(this.children);
 				return nodes;
-				// return nodes.filter(function(node){
-					// console.dir(node)
-					// if(node) return node;
-				// });
 			},
 
 			_getActiveNodes: function(fromNodes){

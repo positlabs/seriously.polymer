@@ -18,14 +18,28 @@
 			},
 
 			domReady: function(){
-				this._seriously = this.parentNode.seriously;
-				this.node = this._seriously.target(this.$.canvas);
+				this.getNode();
 			},
 
-			sourceChanged: function(){
-				// console.log('seriously-target.sourceChanged', this.source);
-				if(this.node) this.node.source = this.source.node;
+			getNode: function(){
+				if(this.node == undefined){
+					this._seriously = this.parentNode.seriously;
+					this.node = this._seriously.target(this.$.canvas);
+				}
+				return this.node;
 			},
+
+			// sourceChanged: function(){
+				// console.log('seriously-target.sourceChanged', this.source, this.source.getNode());
+				// this.getNode().source = this.source.getNode();
+
+					// var observer = new ObjectObserver(this.node);
+					// observer.open(function(added, removed, changed, getOldValueFn) {
+					// 	Object.keys(changed).forEach(function(property) {
+					// 		console.log(property, changed[property]);
+					// 	});
+					// });
+			// },
 
 			//TODO: listen for changes to this.source.node, reassign this.node.source
 			//TODO: do the same in seriously-effect

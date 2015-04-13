@@ -49,9 +49,16 @@
 			},
 
 			domReady: function(){
-				this._seriously = this.parentNode.seriously;
-				this.node = this._seriously.source(this.children[0]);
-			}
+				this.getNode();
+			},
+
+			getNode: function(){
+				if(this.node == undefined){
+					this._seriously = this.parentNode.seriously;
+					this.node = this._seriously.source(this.children[0]);
+				}
+				return this.node;
+			},
 
 		});
 
